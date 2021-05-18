@@ -11,13 +11,15 @@ int main(int argc, char *argv[])
 
     //命令行解析
     Config config;
+    config.sql_user = "root";
+    config.sql_passwd="matrix";
+    config.sql_db_name = "mydb";
     config.parse_arg(argc, argv);
 
     WebServer server;
 
     //初始化
-    server.init(config.PORT, user, passwd, databasename, config.OPT_LINGER, 
-                config.sql_num,  config.thread_num, config.close_log);
+    server.init(config);
     //日志
     server.log_write();
 

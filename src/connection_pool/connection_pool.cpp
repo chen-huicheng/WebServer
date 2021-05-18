@@ -30,7 +30,7 @@ void ConnectionPool::init(std::string host,std::string user,std::string passwd,s
     max_conn_=max_conn;
     
     for(int i=0;i<max_conn_;i++){
-        MYSQL *conn;
+        MYSQL *conn=NULL;
         conn=mysql_init(conn);
         if(conn == NULL){
             // log

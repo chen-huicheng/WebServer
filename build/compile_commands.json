@@ -1,0 +1,42 @@
+[
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/connection_pool/connection_pool.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/connection_pool/connection_pool.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/connection_pool/connection_pool.cpp"
+},
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/http/http_conn.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/http/http_conn.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/http/http_conn.cpp"
+},
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/log/log.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/log/log.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/log/log.cpp"
+},
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/timer/lst_timer.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/timer/lst_timer.cpp"
+},
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/util/config.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/util/config.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/util/config.cpp"
+},
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/util/util.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/util/util.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/util/util.cpp"
+},
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/main.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/main.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/main.cpp"
+},
+{
+  "directory": "/home/cheng/vscode/linux_network_program/webserver/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7   -I/home/cheng/vscode/linux_network_program/webserver/include -I/home/cheng/vscode/linux_network_program/webserver/include/http -I/home/cheng/vscode/linux_network_program/webserver/include/connection_pool -I/home/cheng/vscode/linux_network_program/webserver/include/lock -I/home/cheng/vscode/linux_network_program/webserver/include/log -I/home/cheng/vscode/linux_network_program/webserver/include/threadpool -I/home/cheng/vscode/linux_network_program/webserver/include/timer -I/home/cheng/vscode/linux_network_program/webserver/include/util   -O -Wall -g -ggdb -fpermissive   -std=c++11 -std=gnu++11 -o CMakeFiles/webserver.dir/src/webserver.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/webserver.cpp",
+  "file": "/home/cheng/vscode/linux_network_program/webserver/src/webserver.cpp"
+}
+]

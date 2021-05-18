@@ -13,6 +13,9 @@ public:
     void init(std::string url,std::string user,std::string password,std::string db_name,int port ,int max_conn);
     MYSQL *GetConnection();				 //获取数据库连接
 	bool ReleaseConnection(MYSQL *conn); //释放连接
+    int GetMaxConn(){
+        return max_conn_;
+    }
 private:
     ConnectionPool();
     ~ConnectionPool();

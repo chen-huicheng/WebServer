@@ -54,6 +54,7 @@ public:
     {
         NO_REQUEST,
         GET_REQUEST,
+        POST_REQUEST,
         BAD_REQUEST,
         NO_RESOURCE,
         FORBIDDEN_REQUEST,
@@ -73,7 +74,8 @@ public:
     ~http_conn() {}
 
 public:
-    void init(int sockfd, const sockaddr_in &addr);
+    void run(); 
+    void init(int sockfd, const sockaddr_in &addr,char *root);
     void close_conn(bool real_close = true);
     void process();
     bool read();
@@ -94,7 +96,8 @@ private:
     HTTP_CODE parse_request_line(char *text);
     HTTP_CODE parse_headers(char *text);
     HTTP_CODE parse_content(char *text);
-    HTTP_CODE do_request();
+    HTTP_CODE do_get_request();
+    HTTP_CODE do_post_request();
     char *get_line() { return m_read_buf + m_start_line; };
     LINE_STATUS parse_line();
     void unmap();
@@ -135,8 +138,7 @@ private:
     struct iovec m_iv[2];
     int m_iv_count;
 
-    int cgi;        //是否启用的POST
-    char *m_string; //存储请求头数据
+    char *m_content; //存储请求头数据
     int bytes_to_send;
     int bytes_have_send;
     char *doc_root;

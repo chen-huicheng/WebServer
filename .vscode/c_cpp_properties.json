@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include/",
+                "${workspaceFolder}/**"　　　//头文件以及库文件的搜索路径也可以添加进去
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",　//编译器路径
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

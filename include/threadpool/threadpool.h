@@ -14,7 +14,7 @@ public:
     /*thread_number是线程池中线程的数量，max_requests是请求队列中最多允许的、等待处理的请求的数量*/
     threadpool(int thread_number = 8, int max_request = 10000);
     ~threadpool();
-    bool append(T *request);
+    bool append(T *request,int state);
 
 private:
     /*工作线程运行的函数，它不断从工作队列中取出任务并执行之*/
@@ -23,7 +23,7 @@ private:
 
 private:
     int m_thread_number;        //线程池中的线程数
-    int m_max_requests;         //请求队列中允许的最大请求数
+    uint m_max_requests;        //请求队列中允许的最大请求数
     pthread_t *m_threads;       //描述线程池的数组，其大小为m_thread_number
     std::list<T *> m_workqueue; //请求队列
     locker m_queuelocker;       //保护请求队列的互斥锁
@@ -31,7 +31,7 @@ private:
     bool m_stop;                //是否结束线程
 };
 template <typename T>
-threadpool<T>::threadpool( int thread_number, int max_requests):m_thread_number(thread_number), m_max_requests(max_requests), m_stop(false),m_threads(NULL)
+threadpool<T>::threadpool(int thread_number, int max_requests) : m_thread_number(thread_number), m_max_requests(max_requests), m_stop(false), m_threads(NULL)
 {
     if (thread_number <= 0 || max_requests <= 0)
         throw std::exception();
@@ -56,11 +56,11 @@ template <typename T>
 threadpool<T>::~threadpool()
 {
     delete[] m_threads;
-    m_stop = false;
+    m_stop = true;
 }
 
 template <typename T>
-bool threadpool<T>::append(T *request)
+bool threadpool<T>::append(T *request, int state)
 {
     m_queuelocker.lock();
     if (m_workqueue.size() >= m_max_requests)
@@ -68,6 +68,7 @@ bool threadpool<T>::append(T *request)
         m_queuelocker.unlock();
         return false;
     }
+    request->m_state = state;
     m_workqueue.push_back(request);
     m_queuelocker.unlock();
     m_queuestat.post();
@@ -97,7 +98,6 @@ void threadpool<T>::run()
         m_queuelocker.unlock();
         if (!request)
             continue;
-        request->process();
+        request->run();
     }
 }
-

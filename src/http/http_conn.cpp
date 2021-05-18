@@ -63,7 +63,7 @@ void http_conn::close_conn(bool real_close)
 }
 
 //初始化连接,外部调用初始化套接字地址
-void http_conn::init(int sockfd, const sockaddr_in &addr)
+void http_conn::init(int sockfd, const sockaddr_in &addr,char *root)
 {
     m_sockfd = sockfd;
     m_address = addr;
@@ -73,6 +73,11 @@ void http_conn::init(int sockfd, const sockaddr_in &addr)
     m_user_count++;
 
     init();
+
+
+    //当浏览器出现连接重置时，可能是网站根目录出错或http响应格式出错或者访问的文件中内容完全为空
+    doc_root = root;
+
 }
 
 //初始化新接受的连接
@@ -93,7 +98,6 @@ void http_conn::init()
     m_checked_idx = 0;
     m_read_idx = 0;
     m_write_idx = 0;
-    cgi = 0;
     m_state = 0;
     timer_flag = 0;
     improv = 0;
@@ -101,6 +105,36 @@ void http_conn::init()
     memset(m_read_buf, '\0', READ_BUFFER_SIZE);
     memset(m_write_buf, '\0', WRITE_BUFFER_SIZE);
     memset(m_real_file, '\0', FILENAME_LEN);
+}
+//循环读取客户数据，直到无数据可读或对方关闭连接
+bool http_conn::read()
+{
+    if (m_read_idx >= READ_BUFFER_SIZE)
+    {
+        return false;
+    }
+    int bytes_read = 0;
+    while (true)
+    {
+        bytes_read = recv(m_sockfd, m_read_buf + m_read_idx, READ_BUFFER_SIZE - m_read_idx, 0);
+        if (bytes_read == -1)
+        {
+            if (errno == EINTR) //读取过程中被中断
+            {
+                bytes_read = 0;
+                continue;
+            }
+            else if (errno == EAGAIN || errno == EWOULDBLOCK)
+                break;
+            return false;
+        }
+        else if (bytes_read == 0)
+        {
+            return false;
+        }
+        m_read_idx += bytes_read;
+    }
+    return true;
 }
 
 //从状态机，用于分析出一行内容
@@ -137,35 +171,11 @@ http_conn::LINE_STATUS http_conn::parse_line()
     return LINE_OPEN;
 }
 
-//循环读取客户数据，直到无数据可读或对方关闭连接
-bool http_conn::read()
-{
-    if (m_read_idx >= READ_BUFFER_SIZE)
-    {
-        return false;
-    }
-    int bytes_read = 0;
-    while (true)
-    {
-        bytes_read = recv(m_sockfd, m_read_buf + m_read_idx, READ_BUFFER_SIZE - m_read_idx, 0);
-        if (bytes_read == -1)
-        {
-            if (errno == EAGAIN || errno == EWOULDBLOCK)
-                break;
-            return false;
-        }
-        else if (bytes_read == 0)
-        {
-            return false;
-        }
-        m_read_idx += bytes_read;
-    }
-    return true;
-}
 
 //解析http请求行，获得请求方法，目标url及http版本号
 http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
 {
+    //char *strpbrk(const char *str1, const char *str2) 检索字符串 str1 中第一个匹配字符串 str2 中字符的字符，不包含空结束字符'\0'。
     m_url = strpbrk(text, " \t");
     if (!m_url)
     {
@@ -173,16 +183,15 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
     }
     *m_url++ = '\0';
     char *method = text;
-    if (strcasecmp(method, "GET") == 0)
+    if (strcasecmp(method, "GET") == 0)  //用忽略大小写比较字符串
         m_method = GET;
     else if (strcasecmp(method, "POST") == 0)
     {
         m_method = POST;
-        cgi = 1;
     }
     else
         return BAD_REQUEST;
-    m_url += strspn(m_url, " \t");
+    m_url += strspn(m_url, " \t");//size_t strspn(const char *str1, const char *str2) 检索字符串 str1 中第一个不在字符串 str2 中出现的字符下标。
     m_version = strpbrk(m_url, " \t");
     if (!m_version)
         return BAD_REQUEST;
@@ -206,7 +215,7 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
         return BAD_REQUEST;
     //当url为/时，显示判断界面
     if (strlen(m_url) == 1)
-        strcat(m_url, "judge.html");
+        strcat(m_url, "index.html");
     m_check_state = CHECK_STATE_HEADER;
     return NO_REQUEST;
 }
@@ -214,7 +223,7 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
 //解析http请求的一个头部信息
 http_conn::HTTP_CODE http_conn::parse_headers(char *text)
 {
-    if (text[0] == '\0')
+    if (text[0] == '\0') //空行结束头解析 
     {
         if (m_content_length != 0)
         {
@@ -257,9 +266,14 @@ http_conn::HTTP_CODE http_conn::parse_content(char *text)
     if (m_read_idx >= (m_content_length + m_checked_idx))
     {
         text[m_content_length] = '\0';
-        //POST请求中最后为输入的用户名和密码
-        m_string = text;
-        return GET_REQUEST;
+        if(m_method == GET)
+            return GET_REQUEST;
+        else if(m_method == POST){
+            //POST请求中最后为输入的用户名和密码
+            m_content = text;
+            return POST_REQUEST;
+        }
+        
     }
     return NO_REQUEST;
 }
@@ -287,11 +301,9 @@ http_conn::HTTP_CODE http_conn::process_read()
         case CHECK_STATE_HEADER:
         {
             ret = parse_headers(text);
-            if (ret == BAD_REQUEST)
-                return BAD_REQUEST;
-            else if (ret == GET_REQUEST)
+            if (ret == GET_REQUEST)
             {
-                return do_request();
+                return do_get_request();
             }
             break;
         }
@@ -299,7 +311,9 @@ http_conn::HTTP_CODE http_conn::process_read()
         {
             ret = parse_content(text);
             if (ret == GET_REQUEST)
-                return do_request();
+                return do_get_request();
+            if(ret == POST_REQUEST)
+                return do_post_request();
             line_status = LINE_OPEN;
             break;
         }
@@ -309,16 +323,14 @@ http_conn::HTTP_CODE http_conn::process_read()
     }
     return NO_REQUEST;
 }
-
-http_conn::HTTP_CODE http_conn::do_request()
-{
+http_conn::HTTP_CODE http_conn::do_post_request(){
+        
     strcpy(m_real_file, doc_root);
     int len = strlen(doc_root);
     //printf("m_url:%s\n", m_url);
     const char *p = strrchr(m_url, '/');
-
     //处理cgi
-    if (cgi == 1 && (*(p + 1) == '2' || *(p + 1) == '3'))
+    if ((*(p + 1) == '2' || *(p + 1) == '3'))
     {
 
         //根据标志判断是登录检测还是注册检测
@@ -334,13 +346,13 @@ http_conn::HTTP_CODE http_conn::do_request()
         //user=123&passwd=123
         char name[100], password[100];
         int i;
-        for (i = 5; m_string[i] != '&'; ++i)
-            name[i - 5] = m_string[i];
+        for (i = 5; m_content[i] != '&'; ++i)
+            name[i - 5] = m_content[i];
         name[i - 5] = '\0';
 
         int j = 0;
-        for (i = i + 10; m_string[i] != '\0'; ++i, ++j)
-            password[j] = m_string[i];
+        for (i = i + 10; m_content[i] != '\0'; ++i, ++j)
+            password[j] = m_content[i];
         password[j] = '\0';
 
         if (*(p + 1) == '3')
@@ -421,9 +433,14 @@ http_conn::HTTP_CODE http_conn::do_request()
 
         free(m_url_real);
     }
-    else
-        strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
-
+    
+}
+http_conn::HTTP_CODE http_conn::do_get_request()
+{
+    strcpy(m_real_file, doc_root);
+    int len = strlen(doc_root);
+    strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
+    
     if (stat(m_real_file, &m_file_stat) < 0)
         return NO_RESOURCE;
 
@@ -449,7 +466,6 @@ void http_conn::unmap()
 bool http_conn::write()
 {
     int temp = 0;
-
     if (bytes_to_send == 0)
     {
         modfd(m_epollfd, m_sockfd, EPOLLIN);
@@ -463,7 +479,12 @@ bool http_conn::write()
 
         if (temp < 0)
         {
-            if (errno == EAGAIN)
+            if (errno == EINTR) //读取过程中被中断
+            {
+                temp = 0;
+                continue;
+            }
+            else if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
                 modfd(m_epollfd, m_sockfd, EPOLLOUT);
                 return true;
@@ -471,7 +492,7 @@ bool http_conn::write()
             unmap();
             return false;
         }
-
+        //TODO:大文件测试   去掉下边
         bytes_have_send += temp;
         bytes_to_send -= temp;
         if (bytes_have_send >= m_iv[0].iov_len)
@@ -624,4 +645,32 @@ void http_conn::process()
         close_conn();
     }
     modfd(m_epollfd, m_sockfd, EPOLLOUT);
+}
+
+void http_conn::run(){
+    if (0 == m_state)
+        {
+            if (read())
+            {
+                improv = 1;
+                process();
+            }
+            else
+            {
+                improv = 1;
+                timer_flag = 1;
+            }
+        }
+        else
+        {
+            if (write())
+            {
+                improv = 1;
+            }
+            else
+            {
+                improv = 1;
+                timer_flag = 1;
+            }
+        }
 }

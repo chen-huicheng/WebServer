@@ -28,17 +28,16 @@ WebServer::~WebServer()
     delete m_pool;
 }
 
-void WebServer::init(int port, string user, string passWord, string databaseName,
-                     int opt_linger, int sql_num, int thread_num, int close_log)
+void WebServer::init(Config config)
 {
-    m_port = port;
-    m_user = user;
-    m_passWord = passWord;
-    m_databaseName = databaseName;
-    m_sql_num = sql_num;
-    m_thread_num = thread_num;
-    m_OPT_LINGER = opt_linger;
-    m_close_log = close_log;
+    m_port = config.port;
+    m_user = config.sql_user;
+    m_passwd = config.sql_passwd;
+    m_db_name = config.sql_db_name;
+    m_sql_num = config.sql_num;
+    m_thread_num = config.thread_num;
+    m_opt_linger = config.opt_linger;
+    m_close_log = config.close_log;
 }
 
 void WebServer::log_write()
@@ -52,7 +51,7 @@ void WebServer::log_write()
 void WebServer::sql_pool()
 {
     //初始化数据库连接池
-    ConnectionPool::GetInstance()->init("localhost", m_user, m_passWord, m_databaseName, 3306, m_sql_num);
+    ConnectionPool::GetInstance()->init("localhost", m_user, m_passwd, m_db_name, 3306, m_sql_num);
 
     //初始化数据库读取表
     users->initmysql_result();
@@ -61,7 +60,7 @@ void WebServer::sql_pool()
 void WebServer::thread_pool()
 {
     //线程池
-    m_pool = new threadpool<http_conn>(m_thread_num); //TODO:max_request
+    m_pool = new threadpool<http_conn>(m_thread_num,10000); //TODO:max_request
 }
 
 void WebServer::eventListen()
@@ -69,18 +68,16 @@ void WebServer::eventListen()
     m_listenfd = open_listenfd(m_port);
     utils.init(TIMESLOT);
 
-    //epoll创建内核事件表
-    epoll_event events[MAX_EVENT_NUMBER];
     m_epollfd = epoll_create(5);
     assert(m_epollfd != -1);
 
-    utils.addfd(m_epollfd, m_listenfd, false);//TODO:ET mode
+    addfd(m_epollfd, m_listenfd, false);//TODO:ET mode
     http_conn::m_epollfd = m_epollfd;
 
     int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, m_pipefd);
     assert(ret != -1);
-    utils.setnonblocking(m_pipefd[1]);
-    utils.addfd(m_epollfd, m_pipefd[0], false);
+    setnonblocking(m_pipefd[1]);
+    addfd(m_epollfd, m_pipefd[0], false);
 
     utils.addsig(SIGPIPE, SIG_IGN);
     utils.addsig(SIGALRM, utils.sig_handler, false);
@@ -95,7 +92,7 @@ void WebServer::eventListen()
 
 void WebServer::timer(int connfd, struct sockaddr_in client_address)
 {
-    users[connfd].init(connfd, client_address);
+    users[connfd].init(connfd, client_address,m_root);
 
     //初始化client_data数据
     //创建定时器，设置回调函数和超时时间，绑定用户数据，将定时器添加到链表中
@@ -155,7 +152,6 @@ bool WebServer::dealclinetdata()
 bool WebServer::dealwithsignal(bool &timeout, bool &stop_server)
 {
     int ret = 0;
-    int sig;
     char signals[1024];
     ret = recv(m_pipefd[0], signals, sizeof(signals), 0);
     if (ret == -1)
@@ -198,21 +194,21 @@ void WebServer::dealwithread(int sockfd)
     }
 
     //若监测到读事件，将该事件放入请求队列
-    m_pool->append(users + sockfd);
+    m_pool->append(users + sockfd,0);
 
-    while (true)
-    {
-        if (1 == users[sockfd].improv)
-        {
-            if (1 == users[sockfd].timer_flag)
-            {
-                deal_timer(timer, sockfd);
-                users[sockfd].timer_flag = 0;
-            }
-            users[sockfd].improv = 0;
-            break;
-        }
-    }
+    // while (true)
+    // {
+    //     if (1 == users[sockfd].improv)
+    //     {
+    //         if (1 == users[sockfd].timer_flag)
+    //         {
+    //             deal_timer(timer, sockfd);
+    //             users[sockfd].timer_flag = 0;
+    //         }
+    //         users[sockfd].improv = 0;
+    //         break;
+    //     }
+    // }
 }
 
 void WebServer::dealwithwrite(int sockfd)
@@ -223,8 +219,7 @@ void WebServer::dealwithwrite(int sockfd)
     {
         adjust_timer(timer);
     }
-
-    m_pool->append(users + sockfd);
+    m_pool->append(users + sockfd,1);
 
     while (true)
     {

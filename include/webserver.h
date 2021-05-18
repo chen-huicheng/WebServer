@@ -13,6 +13,7 @@
 
 #include "threadpool.h"
 #include "http_conn.h"
+#include "config.h"
 
 const int MAX_FD = 65536;           //最大文件描述符
 const int MAX_EVENT_NUMBER = 10000; //最大事件数
@@ -24,13 +25,11 @@ public:
     WebServer();
     ~WebServer();
 
-    void init(int port , string user, string passWord, string databaseName,
-              int opt_linger, int sql_num, int thread_num, int close_log);
+    void init(Config config);
 
     void thread_pool();
     void sql_pool();
     void log_write();
-    void trig_mode();
     void eventListen();
     void eventLoop();
     void timer(int connfd, struct sockaddr_in client_address);
@@ -54,8 +53,8 @@ public:
 
     //数据库相关
     string m_user;         //登陆数据库用户名
-    string m_passWord;     //登陆数据库密码
-    string m_databaseName; //使用数据库名
+    string m_passwd;     //登陆数据库密码
+    string m_db_name; //使用数据库名
     int m_sql_num;
 
     //线程池相关
@@ -66,8 +65,7 @@ public:
     epoll_event events[MAX_EVENT_NUMBER];
 
     int m_listenfd;
-    int m_OPT_LINGER;
-    int m_TRIGMode;
+    int m_opt_linger;
 
     //定时器相关
     client_data *users_timer;
