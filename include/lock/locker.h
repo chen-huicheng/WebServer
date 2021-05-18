@@ -1,10 +1,10 @@
-#ifndef LOCKER_H
-#define LOCKER_H
+#pragma once
 
 #include <exception>
 #include <pthread.h>
 #include <semaphore.h>
 #include <errno.h>
+#include "locker.h"
 /* 封装信号量的类 */
 class sem
 {
@@ -116,4 +116,3 @@ private:
     pthread_cond_t m_cond;
     pthread_mutex_t m_mutex;
 };
-#endif // LOCKER_H

@@ -1,5 +1,4 @@
-#ifndef CONNECTION_POOL_H
-#define CONNECTION_POOL_H
+#pragma once
 
 #include <stdio.h>
 #include <list>
@@ -11,15 +10,9 @@
 class ConnectionPool{
 public:
     static ConnectionPool* GetInstance();
-    void init(std::string url,std::string user,std::string password,std::string db_name,int port ,int max_conn,int close_log);
+    void init(std::string url,std::string user,std::string password,std::string db_name,int port ,int max_conn);
     MYSQL *GetConnection();				 //获取数据库连接
 	bool ReleaseConnection(MYSQL *conn); //释放连接
-    void CloseLog(){
-        close_log_=true;
-    }
-    void OpenLog(){
-        close_log_=false;
-    }
 private:
     ConnectionPool();
     ~ConnectionPool();
@@ -30,12 +23,11 @@ private:
 	std::list<MYSQL *> pool_; //连接池
 	sem reserve_;
 
-    std::string host_;			 //主机地址
+    std::string host_;		//主机地址
 	std::string user_;		 //登陆数据库用户名
 	std::string passwd_;	 //登陆数据库密码
 	std::string db_name_; //使用数据库名
     int port_;		    //数据库端口号
-	bool close_log_;	//日志开关
 };
 class Connection
 {
@@ -48,4 +40,3 @@ public:
 private:
     MYSQL *conn_;
 };
-#endif //SQL_CONNECTION_POOL_H

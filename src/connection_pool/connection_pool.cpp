@@ -4,9 +4,12 @@ ConnectionPool::ConnectionPool(){
     max_conn_=0;
     free_conn_=0;
 }
+
+// TODO:外部关闭内部会报错 多次关闭 封装性
 ConnectionPool::~ConnectionPool(){
     lock_.lock();
     for(auto it:pool_){
+        if(NULL==it)continue;
         mysql_close(it);
     }
     pool_.clear();
@@ -18,14 +21,14 @@ ConnectionPool* ConnectionPool::GetInstance(){
     return &connPool;
 }
 
-void ConnectionPool::init(std::string host,std::string user,std::string passwd,std::string db_name,int port ,int max_conn,int close_log){
+void ConnectionPool::init(std::string host,std::string user,std::string passwd,std::string db_name,int port ,int max_conn){
     host_ = host;
 	user_ = user;
     port_ = port;
     passwd_ = passwd;
     db_name_=db_name;
     max_conn_=max_conn;
-    close_log_=close_log;
+    
     for(int i=0;i<max_conn_;i++){
         MYSQL *conn;
         conn=mysql_init(conn);
@@ -76,6 +79,6 @@ Connection::Connection(){
     conn_=ConnectionPool::GetInstance()->GetConnection();
 }
 
-Connection::Connection(){
+Connection::~Connection(){
     ConnectionPool::GetInstance()->ReleaseConnection(conn_);
 }
