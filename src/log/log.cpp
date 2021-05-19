@@ -56,6 +56,7 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_m
 
 void Log::write_log(int level, const char *format, ...)
 {
+    if(close_log_)return;
     time_t t = time(NULL);
     struct tm *sys_tm = localtime(&t);
     struct tm my_tm = *sys_tm;

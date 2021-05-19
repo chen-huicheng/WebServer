@@ -9,7 +9,7 @@ CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../include/connection_pool/co
 CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../include/http/http_conn.h
 CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../include/lock/locker.h
 CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../include/log/log.h
-CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../include/timer/lst_timer.h
+CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../include/timer/timer.h
 CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../include/util/util.h
 CMakeFiles/webserver.dir/src/http/http_conn.cpp.o: ../src/http/http_conn.cpp
 
@@ -22,21 +22,20 @@ CMakeFiles/webserver.dir/src/main.cpp.o: ../include/http/http_conn.h
 CMakeFiles/webserver.dir/src/main.cpp.o: ../include/lock/locker.h
 CMakeFiles/webserver.dir/src/main.cpp.o: ../include/log/log.h
 CMakeFiles/webserver.dir/src/main.cpp.o: ../include/threadpool/threadpool.h
-CMakeFiles/webserver.dir/src/main.cpp.o: ../include/timer/lst_timer.h
+CMakeFiles/webserver.dir/src/main.cpp.o: ../include/timer/timer.h
 CMakeFiles/webserver.dir/src/main.cpp.o: ../include/util/config.h
+CMakeFiles/webserver.dir/src/main.cpp.o: ../include/util/util.h
 CMakeFiles/webserver.dir/src/main.cpp.o: ../include/webserver.h
 CMakeFiles/webserver.dir/src/main.cpp.o: ../src/main.cpp
-
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: ../include/connection_pool/connection_pool.h
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: ../include/http/http_conn.h
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: ../include/lock/locker.h
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: ../include/log/log.h
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: ../include/timer/lst_timer.h
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: ../src/timer/lst_timer.cpp
 
 CMakeFiles/webserver.dir/src/util/config.cpp.o: ../include/util/config.h
 CMakeFiles/webserver.dir/src/util/config.cpp.o: ../src/util/config.cpp
 
+CMakeFiles/webserver.dir/src/util/util.cpp.o: ../include/connection_pool/connection_pool.h
+CMakeFiles/webserver.dir/src/util/util.cpp.o: ../include/http/http_conn.h
+CMakeFiles/webserver.dir/src/util/util.cpp.o: ../include/lock/locker.h
+CMakeFiles/webserver.dir/src/util/util.cpp.o: ../include/log/log.h
+CMakeFiles/webserver.dir/src/util/util.cpp.o: ../include/timer/timer.h
 CMakeFiles/webserver.dir/src/util/util.cpp.o: ../include/util/util.h
 CMakeFiles/webserver.dir/src/util/util.cpp.o: ../src/util/util.cpp
 
@@ -45,7 +44,7 @@ CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/http/http_conn.h
 CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/lock/locker.h
 CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/log/log.h
 CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/threadpool/threadpool.h
-CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/timer/lst_timer.h
+CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/timer/timer.h
 CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/util/config.h
 CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/util/util.h
 CMakeFiles/webserver.dir/src/webserver.cpp.o: ../include/webserver.h

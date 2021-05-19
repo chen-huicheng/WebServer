@@ -14,7 +14,7 @@ public:
     /*thread_number是线程池中线程的数量，max_requests是请求队列中最多允许的、等待处理的请求的数量*/
     threadpool(int thread_number = 8, int max_request = 10000);
     ~threadpool();
-    bool append(T *request,int state);
+    bool append(T *request);
 
 private:
     /*工作线程运行的函数，它不断从工作队列中取出任务并执行之*/
@@ -60,7 +60,7 @@ threadpool<T>::~threadpool()
 }
 
 template <typename T>
-bool threadpool<T>::append(T *request, int state)
+bool threadpool<T>::append(T *request)
 {
     m_queuelocker.lock();
     if (m_workqueue.size() >= m_max_requests)
@@ -68,7 +68,6 @@ bool threadpool<T>::append(T *request, int state)
         m_queuelocker.unlock();
         return false;
     }
-    request->m_state = state;
     m_workqueue.push_back(request);
     m_queuelocker.unlock();
     m_queuestat.post();

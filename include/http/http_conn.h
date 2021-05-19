@@ -23,9 +23,9 @@
 
 #include "locker.h"
 #include "connection_pool.h"
-#include "lst_timer.h"
+// #include "lst_timer.h"
 #include "log.h"
-
+#include "timer.h"
 class http_conn
 {
 public:
@@ -76,18 +76,15 @@ public:
 public:
     void run(); 
     void init(int sockfd, const sockaddr_in &addr,char *root);
-    void close_conn(bool real_close = true);
-    void process();
-    bool read();
-    bool write();
-    sockaddr_in *get_address()
-    {
-        return &m_address;
+    int getSockfd(){
+        return m_sockfd;
     }
-    void initmysql_result();
-    int timer_flag;
-    int improv;
-
+    void setWrite(){
+        m_state=1;
+    }
+    void setRead(){
+        m_state=0;
+    }
 
 private:
     void init();
@@ -110,9 +107,17 @@ private:
     bool add_linger();
     bool add_blank_line();
 
+    void close_conn();
+    void process();
+    bool read();
+    bool write();
+
 public:
     static int m_epollfd;
     static int m_user_count;
+    heap_timer *timer;
+
+private:
     MYSQL *mysql;
     int m_state;  //读为0, 写为1
 
@@ -132,7 +137,7 @@ private:
     char *m_version;
     char *m_host;
     int m_content_length;
-    bool m_linger;
+    bool keep_alive;
     char *m_file_address;
     struct stat m_file_stat;
     struct iovec m_iv[2];
@@ -142,8 +147,6 @@ private:
     int bytes_to_send;
     int bytes_have_send;
     char *doc_root;
-
-    map<string, string> m_users;
 
 };
 

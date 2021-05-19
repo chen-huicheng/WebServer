@@ -1,4 +1,5 @@
 #include "connection_pool.h"
+#include <algorithm>
 
 ConnectionPool::ConnectionPool(){
     max_conn_=0;
@@ -27,7 +28,7 @@ void ConnectionPool::init(std::string host,std::string user,std::string passwd,s
     port_ = port;
     passwd_ = passwd;
     db_name_=db_name;
-    max_conn_=max_conn;
+    max_conn_=std::max(max_conn,MIN_CONN_NUM);
     
     for(int i=0;i<max_conn_;i++){
         MYSQL *conn=NULL;
@@ -76,7 +77,8 @@ bool ConnectionPool::ReleaseConnection(MYSQL *conn){
 
 
 Connection::Connection(){
-    conn_=ConnectionPool::GetInstance()->GetConnection();
+    if(ConnectionPool::GetInstance()->GetMaxConn()>0)
+        conn_=ConnectionPool::GetInstance()->GetConnection();
 }
 
 Connection::~Connection(){

@@ -6,38 +6,15 @@
 #include <sys/epoll.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <signal.h>
+#include <assert.h>
 #include "util.h"
 
 const int MAX_BUFF = 4096;
-//读取n个字符   返回读取字符个数
-ssize_t readn(int fd, void *buff, size_t n)
-{
-    size_t nleft = n;
-    ssize_t nread = 0;
-    char *ptr = (char *)buff;
-    while (nleft > 0)
-    {
-        if ((nread = read(fd, ptr, nleft)) < 0)
-        {
-            if (errno == EINTR) //读取过程中被中断
-                nread = 0;
-            else if (errno == EAGAIN) //没有数据可读
-            {
-                return n - nleft;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-        else if (nread == 0) // EOF
-            break;
-        nleft -= nread;
-        ptr += nread;
-    }
-    return (n - nleft);
-}
+
+int Util::pipefd[2];
+int Util::epollfd;
+TimeHeap *Util::time_heap;
 
 //将文件描述符设置非阻塞
 int setnonblocking(int fd)
@@ -125,4 +102,42 @@ int open_listenfd(int port)
         return -1;
     }
     return listen_fd;
+}
+
+//添加信号
+void addsig(int sig, void(handler)(int), bool restart)
+{
+    struct sigaction sa;
+    memset(&sa, '\0', sizeof(sa));
+    sa.sa_handler = handler;
+    if (restart)
+        sa.sa_flags |= SA_RESTART;
+    sigfillset(&sa.sa_mask);
+    assert(sigaction(sig, &sa, NULL) != -1);
+}
+
+//重置fd上事件
+void reset_oneshot(int epollfd, int fd){
+    epoll_event event;
+    event.data.fd = fd;
+
+    event.events = EPOLLIN | EPOLLET | EPOLLRDHUP | EPOLLONESHOT;
+    epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &event);
+}
+void sig_handler(int sig)
+{
+    //为保证函数的可重入性，保留原来的errno
+    int save_errno = errno;
+    int msg = sig;
+    send(Util::pipefd[1], (char *)&msg, 1, 0);
+    errno = save_errno;
+}
+
+void close_http_conn_cb_func(http_conn *user)
+{
+    if(user==NULL)return;
+    epoll_ctl(Util::epollfd, EPOLL_CTL_DEL, user->getSockfd(), 0);
+    assert(user);
+    close(user->getSockfd());
+    http_conn::m_user_count--;
 }

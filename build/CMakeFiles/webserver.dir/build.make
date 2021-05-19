@@ -129,33 +129,9 @@ CMakeFiles/webserver.dir/src/log/log.cpp.o.provides: CMakeFiles/webserver.dir/sr
 CMakeFiles/webserver.dir/src/log/log.cpp.o.provides.build: CMakeFiles/webserver.dir/src/log/log.cpp.o
 
 
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: CMakeFiles/webserver.dir/flags.make
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o: ../src/timer/lst_timer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o"
-	/usr/bin/x86_64-linux-gnu-g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/timer/lst_timer.cpp
-
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.i"
-	/usr/bin/x86_64-linux-gnu-g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/cheng/vscode/linux_network_program/webserver/src/timer/lst_timer.cpp > CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.i
-
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.s"
-	/usr/bin/x86_64-linux-gnu-g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/cheng/vscode/linux_network_program/webserver/src/timer/lst_timer.cpp -o CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.s
-
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.requires:
-
-.PHONY : CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.requires
-
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.provides: CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.requires
-	$(MAKE) -f CMakeFiles/webserver.dir/build.make CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.provides.build
-.PHONY : CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.provides
-
-CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.provides.build: CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o
-
-
 CMakeFiles/webserver.dir/src/util/config.cpp.o: CMakeFiles/webserver.dir/flags.make
 CMakeFiles/webserver.dir/src/util/config.cpp.o: ../src/util/config.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/webserver.dir/src/util/config.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/webserver.dir/src/util/config.cpp.o"
 	/usr/bin/x86_64-linux-gnu-g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/webserver.dir/src/util/config.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/util/config.cpp
 
 CMakeFiles/webserver.dir/src/util/config.cpp.i: cmake_force
@@ -179,7 +155,7 @@ CMakeFiles/webserver.dir/src/util/config.cpp.o.provides.build: CMakeFiles/webser
 
 CMakeFiles/webserver.dir/src/util/util.cpp.o: CMakeFiles/webserver.dir/flags.make
 CMakeFiles/webserver.dir/src/util/util.cpp.o: ../src/util/util.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/webserver.dir/src/util/util.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/webserver.dir/src/util/util.cpp.o"
 	/usr/bin/x86_64-linux-gnu-g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/webserver.dir/src/util/util.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/util/util.cpp
 
 CMakeFiles/webserver.dir/src/util/util.cpp.i: cmake_force
@@ -203,7 +179,7 @@ CMakeFiles/webserver.dir/src/util/util.cpp.o.provides.build: CMakeFiles/webserve
 
 CMakeFiles/webserver.dir/src/main.cpp.o: CMakeFiles/webserver.dir/flags.make
 CMakeFiles/webserver.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/webserver.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/webserver.dir/src/main.cpp.o"
 	/usr/bin/x86_64-linux-gnu-g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/webserver.dir/src/main.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/main.cpp
 
 CMakeFiles/webserver.dir/src/main.cpp.i: cmake_force
@@ -227,7 +203,7 @@ CMakeFiles/webserver.dir/src/main.cpp.o.provides.build: CMakeFiles/webserver.dir
 
 CMakeFiles/webserver.dir/src/webserver.cpp.o: CMakeFiles/webserver.dir/flags.make
 CMakeFiles/webserver.dir/src/webserver.cpp.o: ../src/webserver.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/webserver.dir/src/webserver.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/webserver.dir/src/webserver.cpp.o"
 	/usr/bin/x86_64-linux-gnu-g++-7  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/webserver.dir/src/webserver.cpp.o -c /home/cheng/vscode/linux_network_program/webserver/src/webserver.cpp
 
 CMakeFiles/webserver.dir/src/webserver.cpp.i: cmake_force
@@ -254,7 +230,6 @@ webserver_OBJECTS = \
 "CMakeFiles/webserver.dir/src/connection_pool/connection_pool.cpp.o" \
 "CMakeFiles/webserver.dir/src/http/http_conn.cpp.o" \
 "CMakeFiles/webserver.dir/src/log/log.cpp.o" \
-"CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o" \
 "CMakeFiles/webserver.dir/src/util/config.cpp.o" \
 "CMakeFiles/webserver.dir/src/util/util.cpp.o" \
 "CMakeFiles/webserver.dir/src/main.cpp.o" \
@@ -266,14 +241,13 @@ webserver_EXTERNAL_OBJECTS =
 ../bin/webserver: CMakeFiles/webserver.dir/src/connection_pool/connection_pool.cpp.o
 ../bin/webserver: CMakeFiles/webserver.dir/src/http/http_conn.cpp.o
 ../bin/webserver: CMakeFiles/webserver.dir/src/log/log.cpp.o
-../bin/webserver: CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o
 ../bin/webserver: CMakeFiles/webserver.dir/src/util/config.cpp.o
 ../bin/webserver: CMakeFiles/webserver.dir/src/util/util.cpp.o
 ../bin/webserver: CMakeFiles/webserver.dir/src/main.cpp.o
 ../bin/webserver: CMakeFiles/webserver.dir/src/webserver.cpp.o
 ../bin/webserver: CMakeFiles/webserver.dir/build.make
 ../bin/webserver: CMakeFiles/webserver.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable ../bin/webserver"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/cheng/vscode/linux_network_program/webserver/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable ../bin/webserver"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/webserver.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -284,7 +258,6 @@ CMakeFiles/webserver.dir/build: ../bin/webserver
 CMakeFiles/webserver.dir/requires: CMakeFiles/webserver.dir/src/connection_pool/connection_pool.cpp.o.requires
 CMakeFiles/webserver.dir/requires: CMakeFiles/webserver.dir/src/http/http_conn.cpp.o.requires
 CMakeFiles/webserver.dir/requires: CMakeFiles/webserver.dir/src/log/log.cpp.o.requires
-CMakeFiles/webserver.dir/requires: CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o.requires
 CMakeFiles/webserver.dir/requires: CMakeFiles/webserver.dir/src/util/config.cpp.o.requires
 CMakeFiles/webserver.dir/requires: CMakeFiles/webserver.dir/src/util/util.cpp.o.requires
 CMakeFiles/webserver.dir/requires: CMakeFiles/webserver.dir/src/main.cpp.o.requires

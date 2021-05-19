@@ -6,6 +6,7 @@
 #include <error.h>
 #include <string>
 #include "locker.h"
+#define MIN_CONN_NUM 3  //数据库最少链接数
 
 class ConnectionPool{
 public:
@@ -35,11 +36,13 @@ private:
 class Connection
 {
 public:
-    MYSQL *GetConn(){
+    MYSQL *GetConn()const{
         return conn_;
     }
     Connection();
     ~Connection();
 private:
+    Connection(Connection&){}
+    Connection &operator=(Connection&){}
     MYSQL *conn_;
 };

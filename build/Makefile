@@ -231,33 +231,6 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/webserver.dir/build.make CMakeFiles/webserver.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/timer/lst_timer.o: src/timer/lst_timer.cpp.o
-
-.PHONY : src/timer/lst_timer.o
-
-# target to build an object file
-src/timer/lst_timer.cpp.o:
-	$(MAKE) -f CMakeFiles/webserver.dir/build.make CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.o
-.PHONY : src/timer/lst_timer.cpp.o
-
-src/timer/lst_timer.i: src/timer/lst_timer.cpp.i
-
-.PHONY : src/timer/lst_timer.i
-
-# target to preprocess a source file
-src/timer/lst_timer.cpp.i:
-	$(MAKE) -f CMakeFiles/webserver.dir/build.make CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.i
-.PHONY : src/timer/lst_timer.cpp.i
-
-src/timer/lst_timer.s: src/timer/lst_timer.cpp.s
-
-.PHONY : src/timer/lst_timer.s
-
-# target to generate assembly for a file
-src/timer/lst_timer.cpp.s:
-	$(MAKE) -f CMakeFiles/webserver.dir/build.make CMakeFiles/webserver.dir/src/timer/lst_timer.cpp.s
-.PHONY : src/timer/lst_timer.cpp.s
-
 src/util/config.o: src/util/config.cpp.o
 
 .PHONY : src/util/config.o
@@ -360,9 +333,6 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/timer/lst_timer.o"
-	@echo "... src/timer/lst_timer.i"
-	@echo "... src/timer/lst_timer.s"
 	@echo "... src/util/config.o"
 	@echo "... src/util/config.i"
 	@echo "... src/util/config.s"
