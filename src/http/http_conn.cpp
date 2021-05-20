@@ -55,6 +55,7 @@ void http_conn::close_conn()
 {
     //删除与该连接有关的定时器   
     Util::time_heap->del_timer(timer);
+    timer=NULL;
     //从epoll监听中删除 并关闭连接
     close_http_conn_cb_func(this);
 }
@@ -516,7 +517,6 @@ bool http_conn::write()
             if (keep_alive)
             {
                 init();
-                //TODO: 重置定时器
                 return true;
             }
             else
@@ -666,6 +666,7 @@ void http_conn::run()
         if (read())
         {
             process();
+            Util::time_heap->adjustTimer(timer,3 * TIMESLOT);
         }
         else
         {
@@ -677,6 +678,8 @@ void http_conn::run()
         if (!write())
         {
             close_conn();
+        }else{
+            Util::time_heap->adjustTimer(timer,3 * TIMESLOT);
         }
     }
 }

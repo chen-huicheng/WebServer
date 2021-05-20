@@ -62,7 +62,14 @@ void WebServer::initIO()
     Util::init(epollfd,time_heap);
     http_conn::m_epollfd = epollfd;
 
-    addfd(epollfd, listenfd, false);//TODO:ET mode
+    // addfd(epollfd, listenfd, false);//TODO:ET mode
+    epoll_event event;
+    event.data.fd = listenfd;
+
+    event.events = EPOLLIN | EPOLLRDHUP;
+
+    epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &event);
+    setnonblocking(listenfd);
 
     addsig(SIGPIPE, SIG_IGN);
     addsig(SIGALRM, sig_handler, true);
@@ -113,9 +120,11 @@ bool WebServer::acceptClient()
         char * info = "Internal server busy";
         send(connfd, info, strlen(info), 0);
         close(connfd);
-        LOG_ERROR("%s", "Internal server busy");
+        LOG_ERROR("%s", info);
         return false;
     }
+    char buf[20];
+    LOG_INFO("accept client from %s:%d",inet_ntop(AF_INET,&client_address.sin_addr,buf,INET_ADDRSTRLEN),ntohs(client_address.sin_port));
     initHttpConn(connfd, client_address);
     return true;
 }
@@ -195,17 +204,13 @@ void WebServer::run()
             LOG_ERROR("%s", "epoll failure");
             break;
         }
-
         for (int i = 0; i < number; i++)
         {
             int sockfd = events[i].data.fd;
-
             //处理新到的客户连接
             if (sockfd == listenfd)
             {
-                bool flag = acceptClient();
-                if (false == flag)
-                    continue;
+                acceptClient();
             }
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
             {

@@ -4,6 +4,7 @@
 #include <string>
 #include"http_conn.h"
 #include "timer.h"
+const int TIMESLOT = 5;             //最小超时单位
 
 int setnonblocking(int fd);
 void addfd(int epollfd,int fd,bool one_shot);

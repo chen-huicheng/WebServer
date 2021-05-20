@@ -66,24 +66,24 @@ public:
         }
     }
     void tick(){
-        heap_timer* tmp=array[0];
         time_t cur = time(NULL);
         while(!empty()){
-            if(!tmp){
+            if(!array[0]){
                 pop_timer();// TODO: break;
+                continue;
             }
-            if(tmp->expire>cur){
+            if(array[0]->expire>cur){
                 break;
             }
-            if(tmp->cb_func){
-                tmp->cb_func(tmp->user_data);
+            if(array[0]->cb_func){
+                array[0]->cb_func(array[0]->user_data);
             }
             pop_timer();
-            tmp=array[0];
         }
     }
     bool adjustTimer(heap_timer *timer,int delay){
-        timer->expire+=delay;
+        if(!timer)return false;
+        timer->expire=time(NULL)+delay;
         if(delay>0){
             percolate_down(timer->hole);
         }else{
