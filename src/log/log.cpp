@@ -35,13 +35,13 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_m
 
     if (p == NULL)
     {
-        snprintf(log_full_name, 255, "%d_%02d_%02d_%s", my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday, file_name);
+        snprintf(log_full_name, 255, "%d_%02d_%02d_%s.log", my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday, file_name);
     }
     else
     {
         strcpy(log_name_, p + 1);
         strncpy(dir_name_, file_name, p - file_name + 1);
-        snprintf(log_full_name, 255, "%s%d_%02d_%02d_%s", dir_name_, my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday, log_name_);
+        snprintf(log_full_name, 255, "%s%d_%02d_%02d_%s.log", dir_name_, my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday, log_name_);
     }
 
     today = my_tm.tm_mday;

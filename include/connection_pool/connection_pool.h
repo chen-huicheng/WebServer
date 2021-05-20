@@ -42,7 +42,7 @@ public:
     Connection();
     ~Connection();
 private:
-    Connection(Connection&){}
-    Connection &operator=(Connection&){}
+    Connection(Connection&);
+    Connection &operator=(Connection&);
     MYSQL *conn_;
 };

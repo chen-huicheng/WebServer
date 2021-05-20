@@ -2,7 +2,6 @@
 #include "webserver.h"
 #include <string>
 using namespace std;
-static int pipefd[2]; //统一信号事件源
 int main(int argc, char *argv[])
 {
     //需要修改的数据库信息,登录名,密码,库名

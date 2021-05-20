@@ -144,8 +144,8 @@ private:
     int m_iv_count;
 
     char *m_content; //存储请求头数据
-    int bytes_to_send;
-    int bytes_have_send;
+    size_t bytes_to_send;
+    size_t bytes_have_send;
     char *doc_root;
 
 };

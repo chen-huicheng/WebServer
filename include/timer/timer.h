@@ -47,6 +47,7 @@ public:
         timer->cb_func=NULL;
         timer->expire=0;
         timer->user_data=NULL;
+        return true;
     }
     heap_timer* top()const{
         if(empty()){
@@ -89,6 +90,7 @@ public:
         }else{
             percolate_up(timer->hole);
         }
+        return true;
     }
     bool empty()const {return cur_size==0;}
     int size()const {

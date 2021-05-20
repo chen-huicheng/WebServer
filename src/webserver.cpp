@@ -117,7 +117,7 @@ bool WebServer::acceptClient()
     }
     if (http_conn::m_user_count >= MAX_FD)
     {
-        char * info = "Internal server busy";
+        char info[] = "Internal server busy";
         send(connfd, info, strlen(info), 0);
         close(connfd);
         LOG_ERROR("%s", info);
