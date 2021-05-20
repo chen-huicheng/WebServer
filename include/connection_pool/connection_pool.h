@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBSERVER_CONNECTION_POOL_H_
+#define WEBSERVER_CONNECTION_POOL_H_
 
 #include <stdio.h>
 #include <list>
@@ -46,3 +47,4 @@ private:
     Connection &operator=(Connection&);
     MYSQL *conn_;
 };
+#endif //WEBSERVER_CONNECTION_POOL_H_

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBSERVER_H_
+#define WEBSERVER_H_
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -69,3 +70,4 @@ private:
     bool timeout=false;
     bool stop_server=false;
 };
+#endif //WEBSERVER_H_

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBSERVER_HTTP_CONN_H_
+#define WEBSERVER_HTTP_CONN_H_
 
 #include <unistd.h>
 #include <signal.h>
@@ -149,5 +150,5 @@ private:
     char *doc_root;
 
 };
-
+#endif //WEBSERVER_HTTP_CONN_H_
 

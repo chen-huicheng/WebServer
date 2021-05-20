@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef WEBSERVER_LOCKER_H_
+#define WEBSERVER_LOCKER_H_
 #include <exception>
 #include <pthread.h>
 #include <semaphore.h>
@@ -116,3 +116,4 @@ private:
     pthread_cond_t m_cond;
     pthread_mutex_t m_mutex;
 };
+#endif //WEBSERVER_LOCKER_H_

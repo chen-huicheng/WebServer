@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBSERVER_TIMER_H_
+#define WEBSERVER_TIMER_H_
 
 #include<time.h>
 class http_conn;
@@ -133,3 +134,4 @@ private:
     int capacity;
     int cur_size;
 };
+#endif //WEBSERVER_TIMER_H_

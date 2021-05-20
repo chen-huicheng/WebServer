@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBSERVER_THREAD_POOL_H_
+#define WEBSERVER_THREAD_POOL_H_
 
 #include <list>
 #include <cstdio>
@@ -101,3 +102,4 @@ void threadpool<T>::run()
         request->run();
     }
 }
+#endif //WEBSERVER_THREAD_POOL_H_

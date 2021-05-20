@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef WEBSERVER_LOG_H_
+#define WEBSERVER_LOG_H_
 #include <stdio.h>
 #include <stdarg.h>
 #include "locker.h"
@@ -60,3 +60,5 @@ private:
         Log::get_instance()->write_log(3, format, ##__VA_ARGS__); \
         Log::get_instance()->flush();                             \
     }
+
+#endif //WEBSERVER_LOG_H_
