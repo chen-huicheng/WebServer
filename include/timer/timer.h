@@ -36,7 +36,18 @@ public:
     }
     bool add_timer(heap_timer *timer){
         if(!timer)return false;
-        if(cur_size>=capacity)return false;
+        if(cur_size>=capacity-capacity/20){
+            for(int i=0;i<cur_size;i++){
+                if(array[i]->cb_func==NULL){
+                    array[i]->expire=0;
+                    percolate_up(timer->hole);
+                }
+            }
+            // printf("before: %d:%d\n",cur_size,capacity);
+            tick();
+            // printf("end   : %d:%d\n",cur_size,capacity);
+            assert(cur_size<capacity);
+        }
         int hole =cur_size++;
         array[hole]=timer;
         array[hole]->hole=hole;
@@ -46,7 +57,6 @@ public:
     bool del_timer(heap_timer *timer){
         if(!timer)return false;
         timer->cb_func=NULL;
-        timer->expire=0;
         timer->user_data=NULL;
         return true;
     }
@@ -64,6 +74,8 @@ public:
             delete array[0];
             array[0]=array[--cur_size];
             array[0]->hole=0;
+            // if(cur_size)
+            //     array[cur_size]=NULL;
             percolate_down(0);
         }
     }
@@ -77,7 +89,7 @@ public:
             if(array[0]->expire>cur){
                 break;
             }
-            if(array[0]->cb_func){
+            if(array[0]->cb_func){//&&array[0]->user_data){//TODO: array[0]->cb_func  ==null  array[0]->user_data!=null
                 array[0]->cb_func(array[0]->user_data);
             }
             pop_timer();
