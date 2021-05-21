@@ -141,3 +141,63 @@ void close_http_conn_cb_func(http_conn *user)
     close(user->getSockfd());
     http_conn::m_user_count--;
 }
+map<string,string> parse_form(string str){
+    map<string,string> kv;
+    string key;
+    string val;
+    bool iskey=true;
+    for(auto c:str){
+        if(c=='='){
+            iskey=false;
+            continue;
+        }
+        if(c=='&'){
+            iskey=true;
+            kv[key]=val;
+            key.clear();
+            val.clear();
+            continue;
+        }
+        if(iskey)key.push_back(c);
+        else
+            val.push_back(c);
+    }
+    if(key.size()&&val.size()){
+        kv[key]=val;
+    }
+    return kv;
+}
+
+bool login_u(string username,string passwd){
+    Connection conn;
+    string select_sql="select * from user where username='"+username+"' and passwd='"+passwd+"'";
+    printf("%s\n",select_sql.c_str());
+    if(mysql_query(conn.GetConn(),select_sql.c_str())){
+        return false;
+    }
+    MYSQL_RES *res;
+    res=mysql_store_result(conn.GetConn());
+    printf("%d\n",mysql_num_rows(res));
+    fflush(stdout);
+    if(mysql_num_rows(res))return true;
+    else{
+        return false;
+    }
+    fflush(stdout);
+}
+bool register_u(string username,string passwd){
+    Connection conn;
+    string insert_sql="insert into user select '"+username+"','"+passwd+"'";
+    printf(insert_sql.c_str());
+    if(mysql_query(conn.GetConn(),insert_sql.c_str())){
+        return false;
+    }else{
+        return true;
+    }
+    if(mysql_store_result(conn.GetConn())){
+        return true;
+    }
+    else{
+        return false;
+    }
+}

@@ -322,12 +322,33 @@ http_conn::HTTP_CODE http_conn::do_post_request()
 {
 
     strcpy(m_real_file, doc_root);
-    // int len = strlen(doc_root);
-    const char *p = strrchr(m_url, '/');
-    if(strcmp(p,"login")==0){
-        LOG_INFO("%s","someone want login");
+    int len = strlen(doc_root);
+    printf("%s\n",m_url);
+    const char *p = strrchr(m_url, '/');//char *strrchr(const char *str, int c) 在参数 str 所指向的字符串中搜索最后一次出现字符 c（一个无符号字符）的位置
+    printf("%s\n",p);
+    p++;
+    map<string,string> kv_pair;
+    kv_pair = parse_form(m_content);
+    printf("%s\n",m_content);
+    if(strlen(p)==5&&strncmp(p,"login",5)==0){
+        string username = kv_pair["username"];
+        string passwd = kv_pair["passwd"];
+
+        if(login_u(username,passwd)){
+            m_url = "/pages/welcome.html";
+        }else{
+            m_url = "/pages/loginError.html";
+        }
+    }else if(strlen(p)==8&&strncmp(p,"register",8)==0){
+        string username = kv_pair["username"];
+        string passwd = kv_pair["passwd"];
+        if(register_u(username,passwd)){
+            m_url = "/pages/welcome.html";
+        }else{
+            m_url = "/pages/registerError.html";
+        }
     }
-    return FORBIDDEN_REQUEST;
+    return do_get_request();
 }
 
 http_conn::HTTP_CODE http_conn::do_get_request()
@@ -335,7 +356,7 @@ http_conn::HTTP_CODE http_conn::do_get_request()
     strcpy(m_real_file, doc_root);
     int len = strlen(doc_root);
     strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
-
+    // printf("%s\n",m_real_file);
     if (stat(m_real_file, &m_file_stat) < 0)
         return NO_RESOURCE;
 
@@ -561,7 +582,6 @@ void http_conn::run()
         if (read())
         {
             process();
-            Util::time_heap->adjustTimer(timer,3 * TIMESLOT);
         }
         else
         {
@@ -573,8 +593,6 @@ void http_conn::run()
         if (!write())
         {
             close_conn();
-        }else{
-            Util::time_heap->adjustTimer(timer,3 * TIMESLOT);
         }
     }
 }
