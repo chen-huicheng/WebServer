@@ -86,6 +86,7 @@ public:
     void setRead(){
         m_state=0;
     }
+    void close_conn();
 
 private:
     void init();
@@ -108,7 +109,6 @@ private:
     bool add_linger();
     bool add_blank_line();
 
-    void close_conn();
     void process();
     bool read();
     bool write();

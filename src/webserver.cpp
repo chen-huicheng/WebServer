@@ -124,6 +124,7 @@ bool WebServer::acceptClient()
         return false;
     }
     char buf[20];
+    // printf("accept client:%d from %s:%d\n",connfd,inet_ntop(AF_INET,&client_address.sin_addr,buf,INET_ADDRSTRLEN),ntohs(client_address.sin_port));
     LOG_INFO("accept client from %s:%d",inet_ntop(AF_INET,&client_address.sin_addr,buf,INET_ADDRSTRLEN),ntohs(client_address.sin_port));
     initHttpConn(connfd, client_address);
     return true;
@@ -215,9 +216,7 @@ void WebServer::run()
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
             {
                 //如有异常 关闭客户端链接
-                heap_timer *timer = users[sockfd].timer;
-                users[sockfd].timer=NULL;
-                time_heap->del_timer(timer);
+                users[sockfd].close_conn();
             }
             //处理信号
             else if ((sockfd == Util::pipefd[0]) && (events[i].events & EPOLLIN))

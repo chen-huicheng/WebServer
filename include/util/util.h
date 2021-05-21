@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string>
+#include <map>
 #include"http_conn.h"
 #include "timer.h"
 const int TIMESLOT = 5;             //最小超时单位
@@ -35,3 +36,6 @@ void addsig(int sig, void(handler)(int), bool restart=true);
 void reset_oneshot(int epollfd, int fd);
 void sig_handler(int sig);
 void close_http_conn_cb_func(http_conn *user);
+map<string,string> parse_form(string str);
+bool login_u(string username,string passwd);
+bool register_u(string username,string passwd);
