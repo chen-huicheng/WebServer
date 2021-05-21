@@ -6,6 +6,13 @@
 
 using namespace std;
 
+enum LOGLEVEL{
+    DEBUG = 0,
+    INFO,
+    WARN,
+    ERROR
+};
+
 class Log
 {
 public:
@@ -19,13 +26,21 @@ public:
     //可选择的参数有日志文件、日志缓冲区大小、最大行数以及最长日志条队列
     bool init(const char *file_name, int close_log, int log_buf_size = 8192, int log_max_lines_ = 5000000);
 
-    void write_log(int level, const char *format, ...);
+    void Log::write_log(LOGLEVEL level, const char *msg, ...);
 
     void flush(void);
+
+    void set_level(LOGLEVEL level){
+        cur_level_ = level;
+    }
+    LOGLEVEL get_level()const{
+        return cur_level_;
+    }
 
 private:
     Log();
     ~Log();
+    const char *levelstr(LOGLEVEL level);
 
 private:
     char dir_name_[128];  //路径名
@@ -38,26 +53,27 @@ private:
     char *buf;
     locker mutex;
     bool close_log_;
+    LOGLEVEL cur_level_;
 };
 
-#define LOG_DEBUG(format, ...)                                    \
+#define LOG_DEBUG(msg, args...)                                    \
     {                                                             \
-        Log::get_instance()->write_log(0, format, ##__VA_ARGS__); \
+        Log::get_instance()->write_log(DEBUG, msg, ##args); \
         Log::get_instance()->flush();                             \
     }
-#define LOG_INFO(format, ...)                                     \
+#define LOG_INFO(msg, args...)                                     \
     {                                                             \
-        Log::get_instance()->write_log(1, format, ##__VA_ARGS__); \
+        Log::get_instance()->write_log(INFO, msg, ##args); \
         Log::get_instance()->flush();                             \
     }
-#define LOG_WARN(format, ...)                                     \
+#define LOG_WARN(msg, args...)                                     \
     {                                                             \
-        Log::get_instance()->write_log(2, format, ##__VA_ARGS__); \
+        Log::get_instance()->write_log(WARN, msg, ##args); \
         Log::get_instance()->flush();                             \
     }
-#define LOG_ERROR(format, ...)                                    \
+#define LOG_ERROR(msg, args...)                                    \
     {                                                             \
-        Log::get_instance()->write_log(3, format, ##__VA_ARGS__); \
+        Log::get_instance()->write_log(ERROR, msg, ##args); \
         Log::get_instance()->flush();                             \
     }
 

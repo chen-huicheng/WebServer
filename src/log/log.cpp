@@ -18,6 +18,21 @@ Log::~Log()
     }
 }
 
+const char *Log::levelstr(LOGLEVEL level) {
+    switch (level) {
+        case DEBUG:
+            return "[DBG]:";
+        case INFO:
+            return "[INF]:";
+        case WARN:
+            return "[WAR]:";
+        case ERROR:
+            return "[ERR]:";
+        default:
+            return "[???]:";
+    }
+}
+
 bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_max_lines)
 {
     close_log_ = close_log;
@@ -54,32 +69,16 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_m
     return true;
 }
 
-void Log::write_log(int level, const char *format, ...)
+void Log::write_log(LOGLEVEL level, const char *msg, ...)
 {
+    if(level<cur_level_||close_log_)return;
     if(close_log_)return;
     time_t t = time(NULL);
     struct tm *sys_tm = localtime(&t);
     struct tm my_tm = *sys_tm;
 
-    char s[16];
-    switch (level)
-    {
-    case 0:
-        strcpy(s, "[debug]:");
-        break;
-    case 1:
-        strcpy(s, "[info]:");
-        break;
-    case 2:
-        strcpy(s, "[warn]:");
-        break;
-    case 3:
-        strcpy(s, "[erro]:");
-        break;
-    default:
-        strcpy(s, "[info]:");
-        break;
-    }
+    const char *str = levelstr(level);
+    
     //写入一个log
     mutex.lock();
     log_lines_++;
@@ -109,16 +108,16 @@ void Log::write_log(int level, const char *format, ...)
     mutex.unlock();
 
     va_list valst;
-    va_start(valst, format);
+    va_start(valst, msg);
 
     mutex.lock();
 
     //写入的具体时间内容格式
     int n = snprintf(buf, 48, "%d-%02d-%02d %02d:%02d:%02d %s ",
                      my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday,
-                     my_tm.tm_hour, my_tm.tm_min, my_tm.tm_sec, s);
+                     my_tm.tm_hour, my_tm.tm_min, my_tm.tm_sec, str);
 
-    int m = vsnprintf(buf + n, log_buf_size_ - 1, format, valst);
+    int m = vsnprintf(buf + n, log_buf_size_ - 1, msg, valst);
     buf[n + m] = '\n';
     buf[n + m + 1] = '\0';
     fputs(buf, fp);

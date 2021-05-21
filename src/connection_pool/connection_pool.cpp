@@ -77,8 +77,7 @@ bool ConnectionPool::ReleaseConnection(MYSQL *conn){
 
 
 Connection::Connection(){
-    if(ConnectionPool::GetInstance()->GetMaxConn()>0)
-        conn_=ConnectionPool::GetInstance()->GetConnection();
+    conn_=ConnectionPool::GetInstance()->GetConnection();
 }
 
 Connection::~Connection(){
