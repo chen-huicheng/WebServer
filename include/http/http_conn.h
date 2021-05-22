@@ -75,16 +75,19 @@ public:
     ~http_conn() {}
 
 public:
-    void run(); 
-    void init(int sockfd, const sockaddr_in &addr,char *root);
-    int getSockfd(){
+    void run();
+    void init(int sockfd, const sockaddr_in &addr, char *root);
+    int getSockfd()
+    {
         return m_sockfd;
     }
-    void setWrite(){
-        m_state=1;
+    void setWrite()
+    {
+        m_state = 1;
     }
-    void setRead(){
-        m_state=0;
+    void setRead()
+    {
+        m_state = 0;
     }
     void close_conn();
 
@@ -120,7 +123,7 @@ public:
 
 private:
     MYSQL *mysql;
-    int m_state;  //读为0, 写为1
+    int m_state; //读为0, 写为1
 
 private:
     int m_sockfd;
@@ -148,7 +151,5 @@ private:
     size_t bytes_to_send;
     size_t bytes_have_send;
     char *doc_root;
-
 };
 #endif //WEBSERVER_HTTP_CONN_H_
-

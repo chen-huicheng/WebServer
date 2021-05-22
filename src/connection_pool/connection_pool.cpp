@@ -1,44 +1,53 @@
 #include "connection_pool.h"
 #include <algorithm>
 
-ConnectionPool::ConnectionPool(){
-    max_conn_=0;
-    free_conn_=0;
+ConnectionPool::ConnectionPool()
+{
+    max_conn_ = 0;
+    free_conn_ = 0;
 }
 
 // TODO:外部关闭内部会报错 多次关闭 封装性
-ConnectionPool::~ConnectionPool(){
+ConnectionPool::~ConnectionPool()
+{
     lock_.lock();
-    for(auto it:pool_){
-        if(NULL==it)continue;
+    for (auto it : pool_)
+    {
+        if (NULL == it)
+            continue;
         mysql_close(it);
     }
     pool_.clear();
     lock_.unlock();
 }
 
-ConnectionPool* ConnectionPool::GetInstance(){
+ConnectionPool *ConnectionPool::GetInstance()
+{
     static ConnectionPool connPool;
     return &connPool;
 }
 
-void ConnectionPool::init(std::string host,std::string user,std::string passwd,std::string db_name,int port ,int max_conn){
+void ConnectionPool::init(std::string host, std::string user, std::string passwd, std::string db_name, int port, int max_conn)
+{
     host_ = host;
-	user_ = user;
+    user_ = user;
     port_ = port;
     passwd_ = passwd;
-    db_name_=db_name;
-    max_conn_=std::max(max_conn,MIN_CONN_NUM);
-    
-    for(int i=0;i<max_conn_;i++){
-        MYSQL *conn=NULL;
-        conn=mysql_init(conn);
-        if(conn == NULL){
+    db_name_ = db_name;
+    max_conn_ = std::max(max_conn, MIN_CONN_NUM);
+
+    for (int i = 0; i < max_conn_; i++)
+    {
+        MYSQL *conn = NULL;
+        conn = mysql_init(conn);
+        if (conn == NULL)
+        {
             // log
             throw std::exception();
         }
-        conn = mysql_real_connect(conn,host.c_str(),user.c_str(),passwd.c_str(),db_name.c_str(),port,NULL,0);
-        if(conn ==NULL){
+        conn = mysql_real_connect(conn, host.c_str(), user.c_str(), passwd.c_str(), db_name.c_str(), port, NULL, 0);
+        if (conn == NULL)
+        {
             throw std::exception();
         }
         pool_.push_back(conn);
@@ -49,22 +58,26 @@ void ConnectionPool::init(std::string host,std::string user,std::string passwd,s
     max_conn_ = free_conn_;
 }
 
-MYSQL* ConnectionPool::GetConnection(){
+MYSQL *ConnectionPool::GetConnection()
+{
     MYSQL *conn = NULL;
 
-	reserve_.wait();
-	lock_.lock();
-    if(0==pool_.size()){
+    reserve_.wait();
+    lock_.lock();
+    if (0 == pool_.size())
+    {
         lock_.unlock();
         return conn;
     }
-	conn = pool_.front();
-	pool_.pop_front();
-	lock_.unlock();
-	return conn;
+    conn = pool_.front();
+    pool_.pop_front();
+    lock_.unlock();
+    return conn;
 }
-bool ConnectionPool::ReleaseConnection(MYSQL *conn){
-    if(NULL == conn){
+bool ConnectionPool::ReleaseConnection(MYSQL *conn)
+{
+    if (NULL == conn)
+    {
         return false;
     }
     lock_.lock();
@@ -75,11 +88,12 @@ bool ConnectionPool::ReleaseConnection(MYSQL *conn){
     return true;
 }
 
-
-Connection::Connection(){
-    conn_=ConnectionPool::GetInstance()->GetConnection();
+Connection::Connection()
+{
+    conn_ = ConnectionPool::GetInstance()->GetConnection();
 }
 
-Connection::~Connection(){
+Connection::~Connection()
+{
     ConnectionPool::GetInstance()->ReleaseConnection(conn_);
 }

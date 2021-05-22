@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     //命令行解析
     Config config;
     config.sql_user = user;
-    config.sql_passwd=passwd;
+    config.sql_passwd = passwd;
     config.sql_db_name = db_name;
     config.parse_arg(argc, argv);
 

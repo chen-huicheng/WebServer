@@ -1,7 +1,8 @@
-#include"config.h"
-Config::Config(){
+#include "config.h"
+Config::Config()
+{
     //端口号,默认80
-    port = 12345;
+    port = 1234;
 
     //优雅关闭链接，默认不使用
     opt_linger = 0;
@@ -16,7 +17,8 @@ Config::Config(){
     close_log = 0;
 }
 
-void Config::parse_arg(int argc, char*argv[]){
+void Config::parse_arg(int argc, char *argv[])
+{
     int opt;
     const char *str = "p:o:s:t:c:";
     while ((opt = getopt(argc, argv, str)) != -1)

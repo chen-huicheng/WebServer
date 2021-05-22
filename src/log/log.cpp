@@ -18,18 +18,20 @@ Log::~Log()
     }
 }
 
-const char *Log::levelstr(LOGLEVEL level) {
-    switch (level) {
-        case DEBUG:
-            return "[DBG]:";
-        case INFO:
-            return "[INF]:";
-        case WARN:
-            return "[WAR]:";
-        case ERROR:
-            return "[ERR]:";
-        default:
-            return "[???]:";
+const char *Log::levelstr(LOGLEVEL level)
+{
+    switch (level)
+    {
+    case DEBUG:
+        return "[DBG]:";
+    case INFO:
+        return "[INF]:";
+    case WARN:
+        return "[WAR]:";
+    case ERROR:
+        return "[ERR]:";
+    default:
+        return "[???]:";
     }
 }
 
@@ -71,14 +73,16 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_m
 
 void Log::write_log(LOGLEVEL level, const char *msg, ...)
 {
-    if(level<cur_level_||close_log_)return;
-    if(close_log_)return;
+    if (level < cur_level_ || close_log_)
+        return;
+    if (close_log_)
+        return;
     time_t t = time(NULL);
     struct tm *sys_tm = localtime(&t);
     struct tm my_tm = *sys_tm;
 
     const char *str = levelstr(level);
-    
+
     //写入一个log
     mutex.lock();
     log_lines_++;

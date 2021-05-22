@@ -99,19 +99,23 @@ public:
         pthread_mutex_destroy(&m_mutex);
         pthread_cond_destroy(&m_cond);
     }
-    bool wait(){
-        int ret=0;
+    bool wait()
+    {
+        int ret = 0;
         pthread_mutex_lock(&m_mutex);
-        ret = pthread_cond_wait(&m_cond,&m_mutex);
+        ret = pthread_cond_wait(&m_cond, &m_mutex);
         pthread_mutex_unlock(&m_mutex);
-        return ret==0;
+        return ret == 0;
     }
-    bool signal(){
-        return pthread_cond_signal(&m_cond)==0;
+    bool signal()
+    {
+        return pthread_cond_signal(&m_cond) == 0;
     }
-    bool broadcast(){
-        return pthread_cond_broadcast(&m_cond)==0;
+    bool broadcast()
+    {
+        return pthread_cond_broadcast(&m_cond) == 0;
     }
+
 private:
     pthread_cond_t m_cond;
     pthread_mutex_t m_mutex;

@@ -6,23 +6,41 @@
     <title>WebServer</title>
 </head>
 <style>
-   body {
-        background-image: url("/img/bg.jpg ");
-    }  
+    * {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    .navbar {
+        /* display: inline; */
+        float: right;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0);
+        padding-left: 40px;
+        padding-right: 10%;
+        padding-top: 20px;
+        padding-bottom: 5px;
+    }
+
+    a {
+        text-decoration: none;
+        color: rgb(0, 0, 0);
+        background: transparent;
+    }
 </style>
 
-
 <body>
-    <br />
-    <br />
-    <div align="center">
+    <div class="navbar">
+        <a href="./pages/register.html">注册</a>
+        <a href="./pages/login.html">登录</a>
+    </div>
+    <div align="center" style="padding-top: 30px;">
         <font size="5"> <strong>欢迎访问WebServer</strong></font>
     </div>
     <br />
     <br />
-        <div align="center"><button type="button" value="注册" onClick="location.href='./pages/register.html'">注册</button></div>
-    <br />
-        <div align="center"><button type="button" value="登录" onClick="location.href='./pages/login.html'"/>登录</div>
+
 </body>
 
 </html>

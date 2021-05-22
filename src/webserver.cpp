@@ -33,8 +33,8 @@ void WebServer::init(Config config)
     thread_num = config.thread_num;
     opt_linger = config.opt_linger;
     close_log = config.close_log;
-    timeout=false;
-    stop_server=false;
+    timeout = false;
+    stop_server = false;
     //日志初始化
     Log::get_instance()->init("./ServerLog", close_log, 2000, 800000);
 
@@ -42,12 +42,11 @@ void WebServer::init(Config config)
     ConnectionPool::GetInstance()->init("localhost", sql_user, sql_passwd, sql_db_name, 3306, sql_num);
 
     //线程池初始化
-    thread_pool = new threadpool<http_conn>(thread_num,10000); //TODO:max_request
+    thread_pool = new threadpool<http_conn>(thread_num, 10000); //TODO:max_request
 
     //初始化事件监听描述符 epoll 监听描述符 listenfd
     initIO();
 }
-
 
 void WebServer::initIO()
 {
@@ -59,7 +58,7 @@ void WebServer::initIO()
     //定时器
     time_heap = new TimeHeap(MAX_FD);
 
-    Util::init(epollfd,time_heap);
+    Util::init(epollfd, time_heap);
     http_conn::m_epollfd = epollfd;
 
     // addfd(epollfd, listenfd, false);//TODO:ET mode
@@ -80,17 +79,18 @@ void WebServer::initIO()
 
 void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
 {
-    users[connfd].init(connfd, client_address,root_dir);
+    users[connfd].init(connfd, client_address, root_dir);
 
-    if(opt_linger){
-        struct linger linger_={1,1};
-        setsockopt(connfd,SOL_SOCKET,SO_LINGER,&linger_,sizeof(linger_));
+    if (opt_linger)
+    {
+        struct linger linger_ = {1, 1};
+        setsockopt(connfd, SOL_SOCKET, SO_LINGER, &linger_, sizeof(linger_));
     }
     //创建定时器，设置回调函数和超时时间，绑定用户数据，将定时器添加到链表中
     heap_timer *timer = new heap_timer(3 * TIMESLOT);
     timer->user_data = &users[connfd];
     timer->cb_func = close_http_conn_cb_func;
-    
+
     users[connfd].timer = timer;
     time_heap->add_timer(timer);
 }
@@ -99,11 +99,10 @@ void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
 //并对新的定时器在链表上的位置进行调整
 void WebServer::adjustTimer(heap_timer *timer)
 {
-    time_heap->adjustTimer(timer,3 * TIMESLOT);
+    time_heap->adjustTimer(timer, 3 * TIMESLOT);
 
     LOG_INFO("%s", "adjust timer once");
 }
-
 
 bool WebServer::acceptClient()
 {
@@ -125,7 +124,7 @@ bool WebServer::acceptClient()
     }
     char buf[20];
     // printf("accept client:%d from %s:%d\n",connfd,inet_ntop(AF_INET,&client_address.sin_addr,buf,INET_ADDRSTRLEN),ntohs(client_address.sin_port));
-    LOG_INFO("accept client from %s:%d",inet_ntop(AF_INET,&client_address.sin_addr,buf,INET_ADDRSTRLEN),ntohs(client_address.sin_port));
+    LOG_INFO("accept client from %s:%d", inet_ntop(AF_INET, &client_address.sin_addr, buf, INET_ADDRSTRLEN), ntohs(client_address.sin_port));
     initHttpConn(connfd, client_address);
     return true;
 }
@@ -159,8 +158,9 @@ bool WebServer::dealSignal()
                 stop_server = true;
                 break;
             }
-            default:{
-                LOG_INFO("%s","get other signal ,deal with default");
+            default:
+            {
+                LOG_INFO("%s", "get other signal ,deal with default");
             }
             }
         }
@@ -177,7 +177,7 @@ void WebServer::dealRead(int sockfd)
     }
     //若监测到读事件，将该事件放入请求队列
     users[sockfd].setRead();
-    thread_pool->append(users + sockfd);//第二个参数为
+    thread_pool->append(users + sockfd); //第二个参数为
 }
 
 void WebServer::dealWrite(int sockfd)
@@ -238,7 +238,7 @@ void WebServer::run()
         if (timeout)
         {
             time_heap->tick();
-            LOG_INFO("timer tick time_heap.size()=%d",time_heap->size());
+            LOG_INFO("timer tick time_heap.size()=%d", time_heap->size());
             alarm(TIMESLOT);
             timeout = false;
         }

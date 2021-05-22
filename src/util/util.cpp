@@ -81,8 +81,7 @@ int open_listenfd(int port)
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     server_addr.sin_port = htons((unsigned short)port);
-    if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) ==
-        -1)
+    if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     {
         close(listen_fd);
         return -1;
@@ -117,7 +116,8 @@ void addsig(int sig, void(handler)(int), bool restart)
 }
 
 //重置fd上事件
-void reset_oneshot(int epollfd, int fd){
+void reset_oneshot(int epollfd, int fd)
+{
     epoll_event event;
     event.data.fd = fd;
 
@@ -135,69 +135,86 @@ void sig_handler(int sig)
 
 void close_http_conn_cb_func(http_conn *user)
 {
-    if(user==NULL)return;
+    if (user == NULL)
+        return;
     epoll_ctl(Util::epollfd, EPOLL_CTL_DEL, user->getSockfd(), 0);
     assert(user);
     close(user->getSockfd());
     http_conn::m_user_count--;
 }
-map<string,string> parse_form(string str){
-    map<string,string> kv;
+map<string, string> parse_form(string str)
+{
+    map<string, string> kv;
     string key;
     string val;
-    bool iskey=true;
-    for(auto c:str){
-        if(c=='='){
-            iskey=false;
+    bool iskey = true;
+    for (auto c : str)
+    {
+        if (c == '=')
+        {
+            iskey = false;
             continue;
         }
-        if(c=='&'){
-            iskey=true;
-            kv[key]=val;
+        if (c == '&')
+        {
+            iskey = true;
+            kv[key] = val;
             key.clear();
             val.clear();
             continue;
         }
-        if(iskey)key.push_back(c);
+        if (iskey)
+            key.push_back(c);
         else
             val.push_back(c);
     }
-    if(key.size()&&val.size()){
-        kv[key]=val;
+    if (key.size() && val.size())
+    {
+        kv[key] = val;
     }
     return kv;
 }
 
-bool login_u(string username,string passwd){
+bool login_u(string username, string passwd)
+{
     Connection conn;
-    string select_sql="select * from user where username='"+username+"' and passwd='"+passwd+"'";
-    printf("%s\n",select_sql.c_str());
-    if(mysql_query(conn.GetConn(),select_sql.c_str())){
+    string select_sql = "select * from user where username='" + username + "' and passwd='" + passwd + "'";
+    printf("%s\n", select_sql.c_str());
+    if (mysql_query(conn.GetConn(), select_sql.c_str()))
+    {
         return false;
     }
     MYSQL_RES *res;
-    res=mysql_store_result(conn.GetConn());
-    printf("%d\n",mysql_num_rows(res));
+    res = mysql_store_result(conn.GetConn());
+    printf("%d\n", mysql_num_rows(res));
     fflush(stdout);
-    if(mysql_num_rows(res))return true;
-    else{
+    if (mysql_num_rows(res))
+        return true;
+    else
+    {
         return false;
     }
     fflush(stdout);
 }
-bool register_u(string username,string passwd){
+bool register_u(string username, string passwd)
+{
     Connection conn;
-    string insert_sql="insert into user select '"+username+"','"+passwd+"'";
+    string insert_sql = "insert into user select '" + username + "','" + passwd + "'";
     printf(insert_sql.c_str());
-    if(mysql_query(conn.GetConn(),insert_sql.c_str())){
+    if (mysql_query(conn.GetConn(), insert_sql.c_str()))
+    {
         return false;
-    }else{
+    }
+    else
+    {
         return true;
     }
-    if(mysql_store_result(conn.GetConn())){
+    if (mysql_store_result(conn.GetConn()))
+    {
         return true;
     }
-    else{
+    else
+    {
         return false;
     }
 }
