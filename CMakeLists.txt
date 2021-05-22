@@ -44,13 +44,3 @@ target_link_libraries(
     -lpthread
     libmysqlclient.so
 )
-
-
-set(project_test ${project_root}/test)
-
-add_executable(test_connectionpool ${src} ${project_test}/test_connectionpool.cpp)
-target_link_libraries(
-    test_connectionpool
-    -lpthread
-    libmysqlclient.so
-)
