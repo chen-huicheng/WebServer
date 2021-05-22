@@ -53,9 +53,9 @@ int http_conn::m_epollfd = -1;
 //关闭连接，关闭一个连接，客户总量减一
 void http_conn::close_conn()
 {
-    //删除与该连接有关的定时器   
+    //删除与该连接有关的定时器
     Util::time_heap->del_timer(timer);
-    timer=NULL;
+    timer = NULL;
     //从epoll监听中删除 并关闭连接
     close_http_conn_cb_func(this);
 }
@@ -167,7 +167,7 @@ http_conn::LINE_STATUS http_conn::parse_line()
 }
 
 //解析http请求行，获得请求方法，目标url及http版本号
-http_conn::HTTP_CODE http_conn::parse_request_line(char *text)//TODO:  https 无法解析
+http_conn::HTTP_CODE http_conn::parse_request_line(char *text) //TODO:  https 无法解析
 {
     //char *strpbrk(const char *str1, const char *str2) 检索字符串 str1 中第一个匹配字符串 str2 中字符的字符，不包含空结束字符'\0'。
     m_url = strpbrk(text, " \t");
@@ -323,28 +323,37 @@ http_conn::HTTP_CODE http_conn::do_post_request()
 
     strcpy(m_real_file, doc_root);
     int len = strlen(doc_root);
-    printf("%s\n",m_url);
-    const char *p = strrchr(m_url, '/');//char *strrchr(const char *str, int c) 在参数 str 所指向的字符串中搜索最后一次出现字符 c（一个无符号字符）的位置
-    printf("%s\n",p);
+    printf("%s\n", m_url);
+    const char *p = strrchr(m_url, '/'); //char *strrchr(const char *str, int c) 在参数 str 所指向的字符串中搜索最后一次出现字符 c（一个无符号字符）的位置
+    printf("%s\n", p);
     p++;
-    map<string,string> kv_pair;
+    map<string, string> kv_pair;
     kv_pair = parse_form(m_content);
-    printf("%s\n",m_content);
-    if(strlen(p)==5&&strncmp(p,"login",5)==0){
+    printf("%s\n", m_content);
+    if (strlen(p) == 5 && strncmp(p, "login", 5) == 0)
+    {
         string username = kv_pair["username"];
         string passwd = kv_pair["passwd"];
 
-        if(login_u(username,passwd)){
+        if (login_u(username, passwd))
+        {
             m_url = "/pages/welcome.html";
-        }else{
+        }
+        else
+        {
             m_url = "/pages/loginError.html";
         }
-    }else if(strlen(p)==8&&strncmp(p,"register",8)==0){
+    }
+    else if (strlen(p) == 8 && strncmp(p, "register", 8) == 0)
+    {
         string username = kv_pair["username"];
         string passwd = kv_pair["passwd"];
-        if(register_u(username,passwd)){
+        if (register_u(username, passwd))
+        {
             m_url = "/pages/welcome.html";
-        }else{
+        }
+        else
+        {
             m_url = "/pages/registerError.html";
         }
     }

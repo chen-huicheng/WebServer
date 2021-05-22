@@ -28,6 +28,7 @@ public:
     ~WebServer();
     void init(Config config);
     void run();
+
 private:
     void adjustTimer(heap_timer *timer);
     void initHttpConn(int connfd, struct sockaddr_in client_address);
@@ -36,7 +37,6 @@ private:
     bool dealSignal();
     void dealRead(int sockfd);
     void dealWrite(int sockfd);
-
 
     void initIO();
     //基础
@@ -47,8 +47,8 @@ private:
     http_conn *users;
 
     //数据库相关
-    string sql_user;         //登陆数据库用户名
-    string sql_passwd;     //登陆数据库密码
+    string sql_user;    //登陆数据库用户名
+    string sql_passwd;  //登陆数据库密码
     string sql_db_name; //使用数据库名
     int sql_num;
 
@@ -67,7 +67,7 @@ private:
     TimeHeap *time_heap;
 
     //信号处理相关
-    bool timeout=false;
-    bool stop_server=false;
+    bool timeout = false;
+    bool stop_server = false;
 };
 #endif //WEBSERVER_H_

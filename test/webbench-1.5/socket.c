@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
+//创建客户端连接
 int Socket(const char *host, int clientPort)
 {
     int sock;
@@ -37,9 +37,9 @@ int Socket(const char *host, int clientPort)
     ad.sin_family = AF_INET;
 
     inaddr = inet_addr(host);
-    if (inaddr != INADDR_NONE)
+    if (inaddr != INADDR_NONE) // ip
         memcpy(&ad.sin_addr, &inaddr, sizeof(inaddr));
-    else
+    else // hostname
     {
         hp = gethostbyname(host);
         if (hp == NULL)
