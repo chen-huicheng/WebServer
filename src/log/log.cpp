@@ -35,13 +35,14 @@ const char *Log::levelstr(LOGLEVEL level)
     }
 }
 
-bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_max_lines)
+bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_max_lines,LOGLEVEL level)
 {
     close_log_ = close_log;
     log_buf_size_ = log_buf_size;
     buf = new char[log_buf_size];
     memset(buf, '\0', log_buf_size);
     log_max_lines_ = log_max_lines;
+    cur_level_ = level;
 
     time_t t = time(NULL);
     struct tm *sys_tm = localtime(&t);
@@ -98,13 +99,13 @@ void Log::write_log(LOGLEVEL level, const char *msg, ...)
 
         if (today != my_tm.tm_mday)
         {
-            snprintf(new_log, 255, "%s%s%s", dir_name_, tail, log_name_);
+            snprintf(new_log, 255, "%s%s%s.log", dir_name_, tail, log_name_);
             today = my_tm.tm_mday;
             log_lines_ = 0;
         }
         else
         {
-            snprintf(new_log, 255, "%s%s%s_%lld", dir_name_, tail, log_name_, log_lines_ / log_max_lines_);
+            snprintf(new_log, 255, "%s%s%s_%lld.log", dir_name_, tail, log_name_, log_lines_ / log_max_lines_);
         }
         fp = fopen(new_log, "a");
     }
