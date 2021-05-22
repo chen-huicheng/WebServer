@@ -5,7 +5,7 @@ set(project_name webserver)
 set(project_root ${PROJECT_SOURCE_DIR})
 set(project_src ${project_root}/src)
 set(project_include ${project_root}/include)
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
 
 set(CMAKE_CXX_STANDARD 11)  #设置使用c11标准编译程序
 add_definitions(-std=c++11) #设置使用c11标准编译程序
@@ -46,11 +46,11 @@ target_link_libraries(
 )
 
 
-# set(project_test ${project_root}/test)
+set(project_test ${project_root}/test)
 
-# add_executable(test_connectionpool ${src} ${project_test}/test_connectionpool.cpp)
-# target_link_libraries(
-#     test_connectionpool
-#     -lpthread
-#     libmysqlclient.so
-# )
+add_executable(test_connectionpool ${src} ${project_test}/test_connectionpool.cpp)
+target_link_libraries(
+    test_connectionpool
+    -lpthread
+    libmysqlclient.so
+)
