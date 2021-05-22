@@ -24,7 +24,7 @@ public:
     }
 
     //可选择的参数有日志文件、日志缓冲区大小、最大行数以及最长日志条队列
-    bool init(const char *file_name, int close_log, int log_buf_size = 8192, int log_max_lines_ = 5000000);
+    bool init(const char *file_name, int close_log, int log_buf_size = 8192, int log_max_lines_ = 5000000,LOGLEVEL level=INFO);
 
     void Log::write_log(LOGLEVEL level, const char *msg, ...);
 

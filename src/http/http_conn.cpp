@@ -249,7 +249,7 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
     }
     else
     {
-        LOG_INFO("oop!unknow header: %s", text);
+        LOG_DEBUG("oop!unknow header: %s", text);
     }
     return NO_REQUEST;
 }
@@ -282,11 +282,11 @@ http_conn::HTTP_CODE http_conn::process_read()
     {
         text = get_line();
         m_start_line = m_checked_idx;
-        LOG_INFO("%s", text);
         switch (m_check_state)
         {
         case CHECK_STATE_REQUESTLINE:
         {
+            LOG_INFO("%s", text);
             ret = parse_request_line(text);
             if (ret == BAD_REQUEST)
                 return BAD_REQUEST;
@@ -323,13 +323,10 @@ http_conn::HTTP_CODE http_conn::do_post_request()
 
     strcpy(m_real_file, doc_root);
     int len = strlen(doc_root);
-    printf("%s\n", m_url);
     const char *p = strrchr(m_url, '/'); //char *strrchr(const char *str, int c) 在参数 str 所指向的字符串中搜索最后一次出现字符 c（一个无符号字符）的位置
-    printf("%s\n", p);
     p++;
     map<string, string> kv_pair;
     kv_pair = parse_form(m_content);
-    printf("%s\n", m_content);
     if (strlen(p) == 5 && strncmp(p, "login", 5) == 0)
     {
         string username = kv_pair["username"];
@@ -365,7 +362,6 @@ http_conn::HTTP_CODE http_conn::do_get_request()
     strcpy(m_real_file, doc_root);
     int len = strlen(doc_root);
     strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
-    // printf("%s\n",m_real_file);
     if (stat(m_real_file, &m_file_stat) < 0)
         return NO_RESOURCE;
 
@@ -437,7 +433,6 @@ bool http_conn::write()
         if (bytes_to_send <= 0)
         {
             unmap();
-            LOG_INFO("write success")
             modfd(m_epollfd, m_sockfd, EPOLLIN);
             if (keep_alive)
             {
@@ -464,11 +459,9 @@ bool http_conn::add_response(const char *format, ...)
         va_end(arg_list);
         return false;
     }
+    LOG_INFO("response:%s", m_write_buf+m_write_idx);
     m_write_idx += len;
     va_end(arg_list);
-
-    LOG_INFO("request:%s", m_write_buf);
-
     return true;
 }
 

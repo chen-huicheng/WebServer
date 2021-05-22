@@ -1,7 +1,7 @@
 #include "config.h"
 Config::Config()
 {
-    //端口号,默认80
+    //端口号,默认1234
     port = 1234;
 
     //优雅关闭链接，默认不使用
@@ -20,7 +20,7 @@ Config::Config()
 void Config::parse_arg(int argc, char *argv[])
 {
     int opt;
-    const char *str = "p:o:s:t:c:";
+    const char *str = "p:l:s:t:c:";
     while ((opt = getopt(argc, argv, str)) != -1)
     {
         switch (opt)
@@ -30,7 +30,7 @@ void Config::parse_arg(int argc, char *argv[])
             port = atoi(optarg);
             break;
         }
-        case 'o':
+        case 'l':
         {
             opt_linger = atoi(optarg);
             break;
