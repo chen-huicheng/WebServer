@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBSERVER_UTIL_H_
+#define WEBSERVER_UTIL_H_
 
 #include <stdlib.h>
 #include <string>
@@ -42,3 +43,5 @@ void close_http_conn_cb_func(http_conn *user);
 map<string, string> parse_form(string str);
 bool login_u(string username, string passwd);
 bool register_u(string username, string passwd);
+
+#endif //WEBSERVER_UTIL_H_

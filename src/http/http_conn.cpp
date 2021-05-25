@@ -249,7 +249,7 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
     }
     else
     {
-        LOG_DEBUG("oop!unknow header: %s", text);
+        LOG_DEBUG("oop!unknow header: %s\n", text);
     }
     return NO_REQUEST;
 }
@@ -286,7 +286,7 @@ http_conn::HTTP_CODE http_conn::process_read()
         {
         case CHECK_STATE_REQUESTLINE:
         {
-            LOG_INFO("%s", text);
+            LOG_INFO("%s\n", text);
             ret = parse_request_line(text);
             if (ret == BAD_REQUEST)
                 return BAD_REQUEST;
@@ -459,7 +459,8 @@ bool http_conn::add_response(const char *format, ...)
         va_end(arg_list);
         return false;
     }
-    LOG_INFO("response:%s", m_write_buf+m_write_idx);
+    if(m_write_buf[m_write_idx]!='/r')
+        LOG_INFO("response: %s", m_write_buf+m_write_idx);
     m_write_idx += len;
     va_end(arg_list);
     return true;

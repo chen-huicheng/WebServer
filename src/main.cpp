@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 
     //初始化
     server.init(config);
+    printf("using port:%d",config.port);
 
     //运行
     server.run();

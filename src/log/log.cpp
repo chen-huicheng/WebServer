@@ -40,7 +40,9 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_m
     close_log_ = close_log;
     log_buf_size_ = log_buf_size;
     buf = new char[log_buf_size];
+    next_buf = new char[log_buf_size];
     memset(buf, '\0', log_buf_size);
+    memset(next_buf, '\0', log_buf_size);
     log_max_lines_ = log_max_lines;
     cur_level_ = level;
 
@@ -117,15 +119,37 @@ void Log::write_log(LOGLEVEL level, const char *msg, ...)
 
     mutex.lock();
 
+
     //写入的具体时间内容格式
-    int n = snprintf(buf, 48, "%d-%02d-%02d %02d:%02d:%02d %s ",
+    if(buf_cur_idx+48>=log_buf_size_){
+        fputs(buf, fp);
+        fflush(fp);
+        memset(buf, '\0', log_buf_size_);
+        buf_cur_idx=0;
+    }
+    int n = snprintf(buf+buf_cur_idx, 48, "%d-%02d-%02d %02d:%02d:%02d %s ",
                      my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday,
                      my_tm.tm_hour, my_tm.tm_min, my_tm.tm_sec, str);
 
-    int m = vsnprintf(buf + n, log_buf_size_ - 1, msg, valst);
-    buf[n + m] = '\n';
-    buf[n + m + 1] = '\0';
-    fputs(buf, fp);
+    buf_cur_idx+=n;
+
+    int m = vsnprintf(buf + buf_cur_idx, log_buf_size_ - 1, msg, valst);
+    if(m+buf_cur_idx>=log_buf_size_||m<0){
+        buf[buf_cur_idx]='\0';
+        fputs(buf, fp);
+        fflush(fp);
+        memset(buf, '\0', log_buf_size_);
+        buf_cur_idx = vsnprintf(buf, log_buf_size_ - 1, msg, valst);
+        if(buf_cur_idx<0||buf_cur_idx>=log_buf_size_)
+        {
+            memset(buf, '\0', log_buf_size_);
+            buf_cur_idx=0;
+            mutex.unlock();
+            return;
+        }
+    }
+    buf_cur_idx+=m;
+    // fputs(buf, fp);
     mutex.unlock();
 
     va_end(valst);
@@ -135,6 +159,9 @@ void Log::flush(void)
 {
     mutex.lock();
     //强制刷新写入流缓冲区
+    fputs(buf, fp);
     fflush(fp);
+    memset(buf, '\0', log_buf_size_);
+    buf_cur_idx=0;
     mutex.unlock();
 }

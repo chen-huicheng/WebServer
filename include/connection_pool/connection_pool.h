@@ -7,6 +7,7 @@
 #include <error.h>
 #include <string>
 #include "locker.h"
+#include "noncopyable.h"
 #define MIN_CONN_NUM 3 //数据库最少链接数
 
 class ConnectionPool
@@ -37,7 +38,8 @@ private:
     std::string db_name_; //使用数据库名
     int port_;            //数据库端口号
 };
-class Connection
+
+class Connection:noncopyable
 {
 public:
     MYSQL *GetConn() const
@@ -46,10 +48,7 @@ public:
     }
     Connection();
     ~Connection();
-
 private:
-    Connection(Connection &);
-    Connection &operator=(Connection &);
     MYSQL *conn_;
 };
 #endif //WEBSERVER_CONNECTION_POOL_H_

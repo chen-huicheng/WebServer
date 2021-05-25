@@ -109,7 +109,7 @@ bool WebServer::acceptClient()
     int connfd = accept(listenfd, (struct sockaddr *)&client_address, &client_addrlength);
     if (connfd < 0)
     {
-        LOG_ERROR("%s:errno is:%d", "accept error", errno);
+        LOG_ERROR("%s:errno is:%d\n", "accept error", errno);
         return false;
     }
     if (http_conn::m_user_count >= MAX_FD)
@@ -117,11 +117,11 @@ bool WebServer::acceptClient()
         char info[] = "Internal server busy";
         send(connfd, info, strlen(info), 0);
         close(connfd);
-        LOG_ERROR(info);
+        LOG_ERROR("%s\n",info);
         return false;
     }
     char buf[20];
-    LOG_DEBUG("accept client from %s:%d", inet_ntop(AF_INET, &client_address.sin_addr, buf, INET_ADDRSTRLEN), ntohs(client_address.sin_port));
+    LOG_DEBUG("accept client from %s:%d\n", inet_ntop(AF_INET, &client_address.sin_addr, buf, INET_ADDRSTRLEN), ntohs(client_address.sin_port));
     initHttpConn(connfd, client_address);
     return true;
 }
@@ -157,7 +157,7 @@ bool WebServer::dealSignal()
             }
             default:
             {
-                LOG_INFO("get other signal ,deal with default");
+                LOG_INFO("get other signal ,deal with default\n");
             }
             }
         }
@@ -199,7 +199,7 @@ void WebServer::run()
         int number = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1);
         if (number < 0 && errno != EINTR)
         {
-            LOG_ERROR("epoll failure");
+            LOG_ERROR("epoll failure\n");
             break;
         }
         for (int i = 0; i < number; i++)
@@ -220,7 +220,7 @@ void WebServer::run()
             {
                 bool flag = dealSignal();
                 if (false == flag)
-                    LOG_ERROR("deal signal failure");
+                    LOG_ERROR("deal signal failure\n");
             }
             //处理客户连接上接收到的数据
             else if (events[i].events & EPOLLIN)
@@ -236,7 +236,8 @@ void WebServer::run()
         {
             int size = time_heap->size();
             time_heap->tick();
-            LOG_INFO("timer tick time_heap.size = %d(before):%d",size, time_heap->size());
+            LOG_INFO("timer tick time_heap.size = %d(before):%d\n",size, time_heap->size());
+            LOG_FLUSH();
             time_t tmp = TIMESLOT;
             if(time_heap->top()->expire<tmp){
                 tmp=time_heap->top()->expire;

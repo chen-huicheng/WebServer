@@ -24,7 +24,6 @@
 
 #include "locker.h"
 #include "connection_pool.h"
-// #include "lst_timer.h"
 #include "log.h"
 #include "timer.h"
 class http_conn

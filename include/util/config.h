@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WEBSERVER_CONFIG_H_
+#define WEBSERVER_CONFIG_H_
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -34,3 +35,5 @@ public:
     string sql_passwd;
     string sql_db_name;
 };
+
+#endif  //WEBSERVER_CONFIG_H_
