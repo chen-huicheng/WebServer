@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <string>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +27,7 @@
 #include "connection_pool.h"
 #include "log.h"
 #include "timer.h"
+
 class http_conn
 {
 public:
@@ -75,7 +77,7 @@ public:
 
 public:
     void run();
-    void init(int sockfd, const sockaddr_in &addr, char *root);
+    void init(int sockfd, const sockaddr_in &addr, string root);
     int getSockfd()
     {
         return m_sockfd;
@@ -118,10 +120,9 @@ private:
 public:
     static int m_epollfd;
     static int m_user_count;
-    heap_timer *timer;
+    weak_ptr<heap_timer> timer;
 
 private:
-    MYSQL *mysql;
     int m_state; //读为0, 写为1
 
 private:
@@ -149,6 +150,6 @@ private:
     char *m_content; //存储请求头数据
     size_t bytes_to_send;
     size_t bytes_have_send;
-    char *doc_root;
+    string doc_root;
 };
 #endif //WEBSERVER_HTTP_CONN_H_

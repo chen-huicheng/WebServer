@@ -12,6 +12,9 @@
 #include <cassert>
 #include <sys/epoll.h>
 
+#include <memory>
+#include<vector>
+
 #include "threadpool.h"
 #include "http_conn.h"
 #include "config.h"
@@ -30,7 +33,7 @@ public:
     void run();
 
 private:
-    void adjustTimer(heap_timer *timer);
+    void adjustTimer(shared_ptr<heap_timer> timer);
     void initHttpConn(int connfd, struct sockaddr_in client_address);
     bool acceptClient();
     bool dealTimer();
@@ -41,10 +44,10 @@ private:
     void initIO();
     //基础
     int port;
-    char *root_dir;
+    string root_dir;
     int close_log;
 
-    http_conn *users;
+    vector<shared_ptr<http_conn>> users;
 
     //数据库相关
     string sql_user;    //登陆数据库用户名
@@ -53,7 +56,7 @@ private:
     int sql_num;
 
     //线程池相关
-    threadpool<http_conn> *thread_pool;
+    shared_ptr<threadpool<http_conn>> thread_pool;
     int thread_num;
 
     //epoll_event相关
@@ -64,7 +67,7 @@ private:
     int opt_linger;
 
     //定时器相关
-    TimeHeap *time_heap;
+    shared_ptr<TimeHeap> time_heap;
 
     //信号处理相关
     bool timeout = false;

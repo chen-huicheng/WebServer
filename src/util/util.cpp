@@ -14,7 +14,7 @@ const int MAX_BUFF = 4096;
 
 int Util::pipefd[2];
 int Util::epollfd;
-TimeHeap *Util::time_heap;
+shared_ptr<TimeHeap> Util::time_heap;
 
 //将文件描述符设置非阻塞
 int setnonblocking(int fd)
@@ -133,9 +133,9 @@ void sig_handler(int sig)
     errno = save_errno;
 }
 
-void close_http_conn_cb_func(http_conn *user)
+void close_http_conn_cb_func(shared_ptr<http_conn> user)
 {
-    if (user == NULL)
+    if (user == nullptr)
         return;
     epoll_ctl(Util::epollfd, EPOLL_CTL_DEL, user->getSockfd(), 0);
     assert(user);

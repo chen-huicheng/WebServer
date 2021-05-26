@@ -1,15 +1,15 @@
 #ifndef WEBSERVER_NONCAPYABLE_H_
 #define WEBSERVER_NONCAPYABLE_H_
 
-class noncopyable
+class Noncopyable
 {
 protected:
-    noncopyable() {}
-    ~noncopyable() {}
+    Noncopyable() {}
+    ~Noncopyable() {}
 
 private:
-    noncopyable(const noncopyable &);
-    const noncopyable &operator=(const noncopyable &);
+    Noncopyable(const Noncopyable &);
+    const Noncopyable &operator=(const Noncopyable &);
 };
 
 #endif  //WEBSERVER_NONCAPYABLE_H_

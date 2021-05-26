@@ -1,6 +1,5 @@
 #include "http_conn.h"
 
-#include <mysql/mysql.h>
 #include <fstream>
 #include "util.h"
 
@@ -15,37 +14,6 @@ const char *error_404_form = "The requested file was not found on this server.\n
 const char *error_500_title = "Internal Error";
 const char *error_500_form = "There was an unusual problem serving the request file.\n";
 
-// locker m_lock;
-// map<string, string> users;
-
-// void http_conn::initmysql_result()
-// {
-//     //先从连接池中取一个连接
-//     Connection conn;
-//     MYSQL *mysql = conn.GetConn();
-//     //在user表中检索username，passwd数据，浏览器端输入
-//     if (mysql_query(mysql, "SELECT username,passwd FROM user"))
-//     {
-//         LOG_ERROR("SELECT error:%s\n", mysql_error(mysql));
-//     }
-
-//     //从表中检索完整的结果集
-//     MYSQL_RES *result = mysql_store_result(mysql);
-
-//     //返回结果集中的列数
-//     int num_fields = mysql_num_fields(result);
-
-//     //返回所有字段结构的数组
-//     MYSQL_FIELD *fields = mysql_fetch_fields(result);
-
-//     //从结果集中获取下一行，将对应的用户名和密码，存入map中
-//     while (MYSQL_ROW row = mysql_fetch_row(result))
-//     {
-//         string temp1(row[0]);
-//         string temp2(row[1]);
-//         users[temp1] = temp2;
-//     }
-// }
 
 int http_conn::m_user_count = 0;
 int http_conn::m_epollfd = -1;
@@ -54,14 +22,16 @@ int http_conn::m_epollfd = -1;
 void http_conn::close_conn()
 {
     //删除与该连接有关的定时器
-    Util::time_heap->del_timer(timer);
-    timer = NULL;
+    Util::time_heap->del_timer(timer.lock());
+    timer.reset();
     //从epoll监听中删除 并关闭连接
-    close_http_conn_cb_func(this);
+    epoll_ctl(Util::epollfd, EPOLL_CTL_DEL, m_sockfd, 0);
+    close(m_sockfd);
+    m_user_count--;
 }
 
 //初始化连接,外部调用初始化套接字地址
-void http_conn::init(int sockfd, const sockaddr_in &addr, char *root)
+void http_conn::init(int sockfd, const sockaddr_in &addr, string root)
 {
     m_sockfd = sockfd;
     m_address = addr;
@@ -78,7 +48,6 @@ void http_conn::init(int sockfd, const sockaddr_in &addr, char *root)
 //check_state默认为分析请求行状态
 void http_conn::init()
 {
-    mysql = NULL;
     bytes_to_send = 0;
     bytes_have_send = 0;
     m_check_state = CHECK_STATE_REQUESTLINE;
@@ -321,8 +290,7 @@ http_conn::HTTP_CODE http_conn::process_read()
 http_conn::HTTP_CODE http_conn::do_post_request()
 {
 
-    strcpy(m_real_file, doc_root);
-    int len = strlen(doc_root);
+    strcpy(m_real_file, doc_root.c_str());
     const char *p = strrchr(m_url, '/'); //char *strrchr(const char *str, int c) 在参数 str 所指向的字符串中搜索最后一次出现字符 c（一个无符号字符）的位置
     p++;
     map<string, string> kv_pair;
@@ -359,8 +327,8 @@ http_conn::HTTP_CODE http_conn::do_post_request()
 
 http_conn::HTTP_CODE http_conn::do_get_request()
 {
-    strcpy(m_real_file, doc_root);
-    int len = strlen(doc_root);
+    strcpy(m_real_file, doc_root.c_str());
+    int len = doc_root.size();
     strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
     if (stat(m_real_file, &m_file_stat) < 0)
         return NO_RESOURCE;
@@ -459,8 +427,7 @@ bool http_conn::add_response(const char *format, ...)
         va_end(arg_list);
         return false;
     }
-    if(m_write_buf[m_write_idx]!='/r')
-        LOG_INFO("response: %s", m_write_buf+m_write_idx);
+    // LOG_INFO("response: %s", m_write_buf+m_write_idx);
     m_write_idx += len;
     va_end(arg_list);
     return true;
@@ -468,6 +435,7 @@ bool http_conn::add_response(const char *format, ...)
 
 bool http_conn::add_status_line(int status, const char *title)
 {
+    LOG_INFO("response: %s %d %s\r\n", "HTTP/1.1", status, title);
     return add_response("%s %d %s\r\n", "HTTP/1.1", status, title);
 }
 
@@ -479,16 +447,19 @@ bool http_conn::add_headers(int content_len)
 
 bool http_conn::add_content_length(int content_len)
 {
+    LOG_INFO("Content-Length:%d\r\n", content_len);
     return add_response("Content-Length:%d\r\n", content_len);
 }
 
 bool http_conn::add_content_type()
 {
+    LOG_INFO("Content-Type:%s\r\n", "text/html");
     return add_response("Content-Type:%s\r\n", "text/html");
 }
 
 bool http_conn::add_linger()
 {
+    LOG_INFO("Connection:%s\r\n", (keep_alive == true) ? "keep-alive" : "close");
     return add_response("Connection:%s\r\n", (keep_alive == true) ? "keep-alive" : "close");
 }
 
@@ -499,7 +470,8 @@ bool http_conn::add_blank_line()
 
 bool http_conn::add_content(const char *content)
 {
-    return add_response("%s", content);
+    LOG_INFO("%s\n",content);
+    return add_response(content);
 }
 
 bool http_conn::process_write(HTTP_CODE ret)

@@ -12,7 +12,7 @@ Log::Log()
 
 Log::~Log()
 {
-    if (fp != NULL)
+    if (NULL != fp)
     {
         fclose(fp);
     }
@@ -53,7 +53,7 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_m
     const char *p = strrchr(file_name, '/');
     char log_full_name[256] = {0};
 
-    if (p == NULL)
+    if (NULL == p)
     {
         snprintf(log_full_name, 255, "%d_%02d_%02d_%s.log", my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday, file_name);
     }
@@ -67,7 +67,7 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int log_m
     today = my_tm.tm_mday;
 
     fp = fopen(log_full_name, "a");
-    if (fp == NULL)
+    if (NULL == fp)
     {
         return false;
     }
@@ -147,11 +147,17 @@ void Log::write_log(LOGLEVEL level, const char *msg, ...)
             mutex.unlock();
             return;
         }
-    }
-    buf_cur_idx+=m;
+    }else
+        buf_cur_idx+=m;
+    // buf[buf_cur_idx]='\0';
     // fputs(buf, fp);
-    mutex.unlock();
+    // fflush(fp);
+    // memset(buf, '\0', log_buf_size_);
+    // buf_cur_idx=0;
 
+
+    mutex.unlock();
+    
     va_end(valst);
 }
 

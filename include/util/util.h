@@ -17,11 +17,12 @@ int open_listenfd(int port);
 class Util
 {
 public:
+
     static int pipefd[2];
     static int epollfd;
     //定时器相关
-    static TimeHeap *time_heap;
-    static void init(int epollfd_, TimeHeap *time_heap_)
+    static shared_ptr<TimeHeap> time_heap;
+    static void init(int epollfd_, shared_ptr<TimeHeap> time_heap_)
     {
         //定时器
         time_heap = time_heap_;
@@ -39,7 +40,7 @@ private:
 void addsig(int sig, void(handler)(int), bool restart = true);
 void reset_oneshot(int epollfd, int fd);
 void sig_handler(int sig);
-void close_http_conn_cb_func(http_conn *user);
+void close_http_conn_cb_func(shared_ptr<http_conn> user);
 map<string, string> parse_form(string str);
 bool login_u(string username, string passwd);
 bool register_u(string username, string passwd);

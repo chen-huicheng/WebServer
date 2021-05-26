@@ -8,7 +8,7 @@
 #include <string>
 #include "locker.h"
 #include "noncopyable.h"
-#define MIN_CONN_NUM 3 //数据库最少链接数
+const int MIN_CONN_NUM = 3; //数据库最少链接数
 
 class ConnectionPool
 {
@@ -37,9 +37,10 @@ private:
     std::string passwd_;  //登陆数据库密码
     std::string db_name_; //使用数据库名
     int port_;            //数据库端口号
+    bool is_init_;        //是否初始化   仅能初始化一次  因此只能链接一个数据库
 };
 
-class Connection:noncopyable
+class Connection:Noncopyable
 {
 public:
     MYSQL *GetConn() const

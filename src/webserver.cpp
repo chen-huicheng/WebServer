@@ -2,25 +2,24 @@
 WebServer::WebServer()
 {
     //http_conn类对象
-    users = new http_conn[MAX_FD];
+    users = vector<shared_ptr<http_conn>>(MAX_FD);
+
+    for(int i=0;i<MAX_FD;++i){
+        users[i]=make_shared<http_conn>();
+    }
 
     //root文件夹路径
     char server_path[200];
     getcwd(server_path, 200);
     char root[6] = "/root";
-    root_dir = (char *)malloc(strlen(server_path) + strlen(root) + 1);
-    strcpy(root_dir, server_path);
-    strcat(root_dir, root);
+    root_dir.append(server_path);
+    root_dir.append(root);
 }
 
 WebServer::~WebServer()
 {
     close(epollfd);
     close(listenfd);
-    delete[] users;
-    delete[] time_heap;
-    delete thread_pool;
-    free(root_dir);
 }
 
 void WebServer::init(Config config)
@@ -42,7 +41,7 @@ void WebServer::init(Config config)
     ConnectionPool::GetInstance()->init("localhost", sql_user, sql_passwd, sql_db_name, 3306, sql_num);
 
     //线程池初始化
-    thread_pool = new threadpool<http_conn>(thread_num, 10000); //TODO:max_request
+    thread_pool = make_shared<threadpool<http_conn>>(thread_num, 10000); //TODO:max_request
 
     //初始化事件监听描述符 epoll 监听描述符 listenfd
     initIO();
@@ -56,7 +55,7 @@ void WebServer::initIO()
     assert(epollfd != -1);
 
     //定时器
-    time_heap = new TimeHeap(MAX_FD);
+    time_heap = make_shared<TimeHeap>(MAX_FD);
 
     Util::init(epollfd, time_heap);
     http_conn::m_epollfd = epollfd;
@@ -79,7 +78,7 @@ void WebServer::initIO()
 
 void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
 {
-    users[connfd].init(connfd, client_address, root_dir);
+    users[connfd]->init(connfd, client_address, root_dir);
 
     if (opt_linger)
     {
@@ -87,17 +86,17 @@ void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
         setsockopt(connfd, SOL_SOCKET, SO_LINGER, &linger_, sizeof(linger_));
     }
     //创建定时器，设置回调函数和超时时间，绑定用户数据，将定时器添加到链表中
-    heap_timer *timer = new heap_timer(3 * TIMESLOT);
-    timer->user_data = &users[connfd];
+    shared_ptr<heap_timer> timer = make_shared<heap_timer>(3 * TIMESLOT);
+    timer->user_data = users[connfd];
     timer->cb_func = close_http_conn_cb_func;
 
-    users[connfd].timer = timer;
+    users[connfd]->timer = timer;
     time_heap->add_timer(timer);
 }
 
 //若有数据传输，则将定时器往后延迟3个单位
 //并对新的定时器在链表上的位置进行调整
-void WebServer::adjustTimer(heap_timer *timer)
+void WebServer::adjustTimer(shared_ptr<heap_timer> timer)
 {
     time_heap->adjustTimer(timer, 3 * TIMESLOT);
 }
@@ -167,26 +166,37 @@ bool WebServer::dealSignal()
 
 void WebServer::dealRead(int sockfd)
 {
-    heap_timer *timer = users[sockfd].timer;
+    shared_ptr<heap_timer> timer = users[sockfd]->timer.lock();
     if (timer)
     {
         adjustTimer(timer);
     }
+    else{
+        timer = make_shared<heap_timer>(3 * TIMESLOT);
+        timer->user_data = users[sockfd];
+        timer->cb_func = close_http_conn_cb_func;
+        users[sockfd]->timer = timer;
+        time_heap->add_timer(timer);
+    }
     //若监测到读事件，将该事件放入请求队列
-    users[sockfd].setRead();
-    thread_pool->append(users + sockfd); //第二个参数为
+    users[sockfd]->setRead();
+    thread_pool->append(users[sockfd]); //第二个参数为
 }
 
 void WebServer::dealWrite(int sockfd)
 {
-    heap_timer *timer = users[sockfd].timer;
+    shared_ptr<heap_timer> timer = users[sockfd]->timer.lock();
     if (timer)
     {
         adjustTimer(timer);
     }
+    else{
+        users[sockfd]->close_conn();
+        return;
+    }
     //若监测到写事件，将该事件放入请求队列
-    users[sockfd].setWrite();
-    thread_pool->append(users + sockfd);
+    users[sockfd]->setWrite();
+    thread_pool->append(users[sockfd]);
 }
 
 void WebServer::run()
@@ -213,7 +223,7 @@ void WebServer::run()
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
             {
                 //如有异常 关闭客户端链接
-                users[sockfd].close_conn();
+                users[sockfd]->close_conn();
             }
             //处理信号
             else if ((sockfd == Util::pipefd[0]) && (events[i].events & EPOLLIN))
@@ -239,7 +249,7 @@ void WebServer::run()
             LOG_INFO("timer tick time_heap.size = %d(before):%d\n",size, time_heap->size());
             LOG_FLUSH();
             time_t tmp = TIMESLOT;
-            if(time_heap->top()->expire<tmp){
+            if(!time_heap->empty()&&time_heap->top()->expire<tmp){
                 tmp=time_heap->top()->expire;
             }
             alarm(TIMESLOT);

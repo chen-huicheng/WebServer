@@ -5,8 +5,9 @@
 #include <semaphore.h>
 #include <errno.h>
 #include "locker.h"
+#include "noncopyable.h"
 /* 封装信号量的类 */
-class sem
+class sem:private Noncopyable
 {
 public:
     //初始化一个为0的信号量
@@ -47,7 +48,7 @@ private:
 };
 
 /* 封装互斥锁的类 */
-class locker
+class locker:private Noncopyable
 {
 public:
     locker()
@@ -78,46 +79,4 @@ private:
     pthread_mutex_t m_mutex;
 };
 
-/* 封装条件变量的类 */
-class cond
-{
-public:
-    cond()
-    {
-        if (pthread_mutex_init(&m_mutex, NULL) != 0)
-        {
-            throw std::exception();
-        }
-        if (pthread_cond_init(&m_cond, NULL) != 0)
-        {
-            pthread_mutex_destroy(&m_mutex);
-            throw std::exception();
-        }
-    }
-    ~cond()
-    {
-        pthread_mutex_destroy(&m_mutex);
-        pthread_cond_destroy(&m_cond);
-    }
-    bool wait()
-    {
-        int ret = 0;
-        pthread_mutex_lock(&m_mutex);
-        ret = pthread_cond_wait(&m_cond, &m_mutex);
-        pthread_mutex_unlock(&m_mutex);
-        return ret == 0;
-    }
-    bool signal()
-    {
-        return pthread_cond_signal(&m_cond) == 0;
-    }
-    bool broadcast()
-    {
-        return pthread_cond_broadcast(&m_cond) == 0;
-    }
-
-private:
-    pthread_cond_t m_cond;
-    pthread_mutex_t m_mutex;
-};
 #endif //WEBSERVER_LOCKER_H_

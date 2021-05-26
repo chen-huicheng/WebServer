@@ -1,10 +1,11 @@
 #include "connection_pool.h"
 #include <algorithm>
-
-ConnectionPool::ConnectionPool()
+#include <log.h>
+ConnectionPool::ConnectionPool():reserve_(0)
 {
     max_conn_ = 0;
     free_conn_ = 0;
+    is_init_= false;
 }
 
 // TODO:外部关闭内部会报错 多次关闭 封装性
@@ -29,32 +30,38 @@ ConnectionPool *ConnectionPool::GetInstance()
 
 void ConnectionPool::init(std::string host, std::string user, std::string passwd, std::string db_name, int port, int max_conn)
 {
+    if(is_init_){
+        LOG_WARN("Connection pool has been initialized\n");
+        fprintf(stderr,"Connection pool has been initialized\n");
+        return;
+    }
+        
+    is_init_=true;
     host_ = host;
     user_ = user;
     port_ = port;
     passwd_ = passwd;
     db_name_ = db_name;
-    printf("%d",max_conn);
     max_conn_ = std::max(max_conn, MIN_CONN_NUM);
 
     for (int i = 0; i < max_conn_; i++)
     {
         MYSQL *conn = NULL;
         conn = mysql_init(conn);
-        if (conn == NULL)
+        if (NULL == conn)
         {
             // log
             throw std::exception();
         }
         conn = mysql_real_connect(conn, host.c_str(), user.c_str(), passwd.c_str(), db_name.c_str(), port, NULL, 0);
-        if (conn == NULL)
+        if (NULL == conn)
         {
             throw std::exception();
         }
         pool_.push_back(conn);
-        ++free_conn_;
+        reserve_.post();
+        free_conn_++;
     }
-    reserve_ = sem(free_conn_);
 
     max_conn_ = free_conn_;
 }
@@ -83,7 +90,6 @@ bool ConnectionPool::ReleaseConnection(MYSQL *conn)
     }
     lock_.lock();
     pool_.push_back(conn);
-    ++free_conn_;
     lock_.unlock();
     reserve_.post();
     return true;
