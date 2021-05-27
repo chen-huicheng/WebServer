@@ -1,8 +1,5 @@
 #include "http_conn.h"
 
-#include <fstream>
-#include "util.h"
-
 //定义http响应的一些状态信息
 const char *ok_200_title = "OK";
 const char *error_400_title = "Bad Request";
@@ -14,18 +11,17 @@ const char *error_404_form = "The requested file was not found on this server.\n
 const char *error_500_title = "Internal Error";
 const char *error_500_form = "There was an unusual problem serving the request file.\n";
 
-
 int http_conn::m_user_count = 0;
 int http_conn::m_epollfd = -1;
-
+shared_ptr<TimeHeap> http_conn::time_heap;
 //关闭连接，关闭一个连接，客户总量减一
 void http_conn::close_conn()
 {
     //删除与该连接有关的定时器
-    Util::time_heap->del_timer(timer.lock());
+    time_heap->del_timer(timer.lock());
     timer.reset();
     //从epoll监听中删除 并关闭连接
-    epoll_ctl(Util::epollfd, EPOLL_CTL_DEL, m_sockfd, 0);
+    epoll_ctl(m_epollfd, EPOLL_CTL_DEL, m_sockfd, 0);
     close(m_sockfd);
     m_user_count--;
 }
@@ -470,7 +466,7 @@ bool http_conn::add_blank_line()
 
 bool http_conn::add_content(const char *content)
 {
-    LOG_INFO("%s\n",content);
+    LOG_INFO("%s\n", content);
     return add_response(content);
 }
 

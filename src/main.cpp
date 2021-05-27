@@ -4,26 +4,33 @@
 using namespace std;
 int main(int argc, char *argv[])
 {
-    //需要修改的数据库信息,登录名,密码,库名
-    string user = "root";
-    string passwd = "matrix";
-    string db_name = "mydb";
+
 
     //命令行解析
     Config config;
-    config.sql_user = user;
-    config.sql_passwd = passwd;
-    config.sql_db_name = db_name;
     config.parse_arg(argc, argv);
 
+    //需要修改的数据库信息,登录名,密码,库名
+     //数据库连接池初始化
+    string user = "root";
+    string passwd = "matrix";
+    string db_name = "mydb";
+    ConnectionPool::GetInstance()->init("localhost", user, passwd, db_name, 3306, config.sql_num);
+
+
+    //日志初始化
+    string log_filename="serverlog";
+    const int log_buf_size=4086;
+    const int log_max_lines=1000000;
+    Log::get_instance()->init(log_filename.c_str(), config.close_log, log_buf_size, log_max_lines);
+
+
     WebServer server;
-
-    //初始化
+    //webserver初始化
     server.init(config);
-    printf("using port:%d",config.port);
-
+    printf("using port:%d\n", config.port);
     //运行
-    server.run();
+    server.loop();
 
     return 0;
 }

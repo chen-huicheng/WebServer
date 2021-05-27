@@ -27,6 +27,7 @@
 #include "connection_pool.h"
 #include "log.h"
 #include "timer.h"
+#include "util.h"
 
 class http_conn
 {
@@ -113,6 +114,7 @@ private:
 public:
     static int m_epollfd;
     static int m_user_count;
+    static shared_ptr<TimeHeap> time_heap;
     weak_ptr<heap_timer> timer;
 
 private:

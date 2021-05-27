@@ -2,6 +2,9 @@
 #define WEBSERVER_LOG_H_
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
+#include <time.h>
+#include <sys/time.h>
 #include "locker.h"
 
 using namespace std;

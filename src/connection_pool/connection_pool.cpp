@@ -1,6 +1,5 @@
 #include "connection_pool.h"
-#include <algorithm>
-#include <log.h>
+
 ConnectionPool::ConnectionPool() : reserve_(0)
 {
     max_conn_ = 0;
@@ -52,6 +51,7 @@ void ConnectionPool::init(std::string host, std::string user, std::string passwd
         if (NULL == conn)
         {
             // log
+            printf("mysqlpool init exception!!!\n");
             throw std::exception();
         }
         conn = mysql_real_connect(conn, host.c_str(), user.c_str(), passwd.c_str(), db_name.c_str(), port, NULL, 0);

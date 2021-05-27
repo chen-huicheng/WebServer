@@ -1,20 +1,9 @@
-#include <errno.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/epoll.h>
-#include <string.h>
-#include <unistd.h>
-#include <signal.h>
-#include <assert.h>
 #include "util.h"
 
 const int MAX_BUFF = 4096;
 
-int Util::pipefd[2];
-int Util::epollfd;
-shared_ptr<TimeHeap> Util::time_heap;
+int Sig::pipefd[2];
+int Sig::epollfd;
 
 //将文件描述符设置非阻塞
 int setnonblocking(int fd)
@@ -103,17 +92,6 @@ int open_listenfd(int port)
     return listen_fd;
 }
 
-//添加信号
-void addsig(int sig, void(handler)(int), bool restart)
-{
-    struct sigaction sa;
-    memset(&sa, '\0', sizeof(sa));
-    sa.sa_handler = handler;
-    if (restart)
-        sa.sa_flags |= SA_RESTART;
-    sigfillset(&sa.sa_mask);
-    assert(sigaction(sig, &sa, NULL) != -1);
-}
 
 //重置fd上事件
 void reset_oneshot(int epollfd, int fd)
@@ -124,20 +102,12 @@ void reset_oneshot(int epollfd, int fd)
     event.events = EPOLLIN | EPOLLET | EPOLLRDHUP | EPOLLONESHOT;
     epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &event);
 }
-void sig_handler(int sig)
-{
-    //为保证函数的可重入性，保留原来的errno
-    int save_errno = errno;
-    int msg = sig;
-    send(Util::pipefd[1], (char *)&msg, 1, 0);
-    errno = save_errno;
-}
 
 void close_http_conn_cb_func(shared_ptr<http_conn> user)
 {
     if (user == nullptr)
         return;
-    epoll_ctl(Util::epollfd, EPOLL_CTL_DEL, user->getSockfd(), 0);
+    epoll_ctl(http_conn::m_epollfd, EPOLL_CTL_DEL, user->getSockfd(), 0);
     assert(user);
     close(user->getSockfd());
     http_conn::m_user_count--;
@@ -217,4 +187,15 @@ bool register_u(string username, string passwd)
     {
         return false;
     }
+}
+
+void addsig(int sig, void(handler)(int), bool restart)
+{
+    struct sigaction sa;
+    memset(&sa, '\0', sizeof(sa));
+    sa.sa_handler = handler;
+    if (restart)
+        sa.sa_flags |= SA_RESTART;
+    sigfillset(&sa.sa_mask);
+    assert(sigaction(sig, &sa, NULL) != -1);
 }

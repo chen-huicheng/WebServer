@@ -6,8 +6,11 @@
 #include <mysql/mysql.h>
 #include <error.h>
 #include <string>
+#include <algorithm>
+
 #include "locker.h"
 #include "noncopyable.h"
+#include "log.h"
 const int MIN_CONN_NUM = 3; //数据库最少链接数
 
 class ConnectionPool

@@ -4,8 +4,9 @@ WebServer::WebServer()
     //http_conn类对象
     users = vector<shared_ptr<http_conn>>(MAX_FD);
 
-    for(int i=0;i<MAX_FD;++i){
-        users[i]=make_shared<http_conn>();
+    for (int i = 0; i < MAX_FD; ++i)
+    {
+        users[i] = make_shared<http_conn>();
     }
 
     //root文件夹路径
@@ -25,23 +26,13 @@ WebServer::~WebServer()
 void WebServer::init(Config config)
 {
     port = config.port;
-    sql_user = config.sql_user;
-    sql_passwd = config.sql_passwd;
-    sql_db_name = config.sql_db_name;
-    sql_num = config.sql_num;
     thread_num = config.thread_num;
     opt_linger = config.opt_linger;
-    close_log = config.close_log;
+    max_request = config.max_request;
     timeout = false;
     stop_server = false;
-    //日志初始化
-    Log::get_instance()->init("./ServerLog", close_log, 2000, 800000);
-
-    //数据库连接池初始化
-    ConnectionPool::GetInstance()->init("localhost", sql_user, sql_passwd, sql_db_name, 3306, sql_num);
-
     //线程池初始化
-    thread_pool = make_shared<threadpool<http_conn>>(thread_num, 10000); //TODO:max_request
+    thread_pool = make_shared<threadpool<http_conn>>(thread_num, max_request);
 
     //初始化事件监听描述符 epoll 监听描述符 listenfd
     initIO();
@@ -54,26 +45,24 @@ void WebServer::initIO()
     epollfd = epoll_create(5);
     assert(epollfd != -1);
 
-    //定时器
-    time_heap = make_shared<TimeHeap>(MAX_FD);
-
-    Util::init(epollfd, time_heap);
     http_conn::m_epollfd = epollfd;
 
-    // addfd(epollfd, listenfd, false);//TODO:ET mode
-    epoll_event event;
-    event.data.fd = listenfd;
+    addfd(epollfd, listenfd, false);//ET mode
+    //设置 listenfd LT触发
+    // epoll_event event;
+    // event.data.fd = listenfd;
 
-    event.events = EPOLLIN | EPOLLRDHUP;
+    // event.events = EPOLLIN | EPOLLRDHUP;
 
-    epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &event);
-    setnonblocking(listenfd);
+    // epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &event);
+    // setnonblocking(listenfd);
 
-    addsig(SIGPIPE, SIG_IGN);
-    addsig(SIGALRM, sig_handler, true);
-    addsig(SIGTERM, sig_handler, true);
-
+    Sig::init(epollfd);
+    Sig::AddSignal();
     alarm(TIMESLOT);
+
+    time_heap = make_shared<TimeHeap>(MAX_FD);
+    http_conn::time_heap=time_heap;
 }
 
 void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
@@ -85,7 +74,7 @@ void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
         struct linger linger_ = {1, 1};
         setsockopt(connfd, SOL_SOCKET, SO_LINGER, &linger_, sizeof(linger_));
     }
-    //创建定时器，设置回调函数和超时时间，绑定用户数据，将定时器添加到链表中
+    //创建定时器，设置回调函数和超时时间，绑定用户数据，将定时器添加到时间堆中
     shared_ptr<heap_timer> timer = make_shared<heap_timer>(3 * TIMESLOT);
     timer->user_data = users[connfd];
     timer->cb_func = close_http_conn_cb_func;
@@ -95,13 +84,12 @@ void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
 }
 
 //若有数据传输，则将定时器往后延迟3个单位
-//并对新的定时器在链表上的位置进行调整
 void WebServer::adjustTimer(shared_ptr<heap_timer> timer)
 {
     time_heap->adjustTimer(timer, 3 * TIMESLOT);
 }
 
-bool WebServer::acceptClient()
+bool WebServer::acceptClient()//TODO:将listenfd修改为ET模式
 {
     struct sockaddr_in client_address;
     socklen_t client_addrlength = sizeof(client_address);
@@ -116,7 +104,7 @@ bool WebServer::acceptClient()
         char info[] = "Internal server busy";
         send(connfd, info, strlen(info), 0);
         close(connfd);
-        LOG_ERROR("%s\n",info);
+        LOG_ERROR("%s\n", info);
         return false;
     }
     char buf[20];
@@ -129,7 +117,7 @@ bool WebServer::dealSignal()
 {
     int ret = 0;
     char signals[1024];
-    ret = recv(Util::pipefd[0], signals, sizeof(signals), 0);
+    ret = recv(Sig::pipefd[0], signals, sizeof(signals), 0);
     if (ret == -1)
     {
         return false;
@@ -171,7 +159,8 @@ void WebServer::dealRead(int sockfd)
     {
         adjustTimer(timer);
     }
-    else{
+    else
+    {
         timer = make_shared<heap_timer>(3 * TIMESLOT);
         timer->user_data = users[sockfd];
         timer->cb_func = close_http_conn_cb_func;
@@ -190,7 +179,8 @@ void WebServer::dealWrite(int sockfd)
     {
         adjustTimer(timer);
     }
-    else{
+    else
+    {
         users[sockfd]->close_conn();
         return;
     }
@@ -199,7 +189,7 @@ void WebServer::dealWrite(int sockfd)
     thread_pool->append(users[sockfd]);
 }
 
-void WebServer::run()
+void WebServer::loop()
 {
     timeout = false;
     stop_server = false;
@@ -218,7 +208,7 @@ void WebServer::run()
             //处理新到的客户连接
             if (sockfd == listenfd)
             {
-                acceptClient();
+                while(acceptClient());
             }
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
             {
@@ -226,7 +216,7 @@ void WebServer::run()
                 users[sockfd]->close_conn();
             }
             //处理信号
-            else if ((sockfd == Util::pipefd[0]) && (events[i].events & EPOLLIN))
+            else if ((sockfd == Sig::pipefd[0]) && (events[i].events & EPOLLIN))
             {
                 bool flag = dealSignal();
                 if (false == flag)
@@ -246,11 +236,12 @@ void WebServer::run()
         {
             int size = time_heap->size();
             time_heap->tick();
-            LOG_INFO("timer tick time_heap.size = %d(before):%d\n",size, time_heap->size());
+            LOG_INFO("timer tick time_heap.size = %d(before):%d\n", size, time_heap->size());
             LOG_FLUSH();
             time_t tmp = TIMESLOT;
-            if(!time_heap->empty()&&time_heap->top()->expire<tmp){
-                tmp=time_heap->top()->expire;
+            if (!time_heap->empty() && time_heap->top()->expire < tmp)
+            {
+                tmp = time_heap->top()->expire;
             }
             alarm(TIMESLOT);
             timeout = false;

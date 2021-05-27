@@ -13,7 +13,7 @@
 #include <sys/epoll.h>
 
 #include <memory>
-#include<vector>
+#include <vector>
 
 #include "threadpool.h"
 #include "http_conn.h"
@@ -23,6 +23,7 @@
 
 const int MAX_FD = 65536;           //最大文件描述符
 const int MAX_EVENT_NUMBER = 10000; //最大事件数
+const int TIMESLOT = 5;             //最小超时单位
 
 class WebServer
 {
@@ -30,7 +31,7 @@ public:
     WebServer();
     ~WebServer();
     void init(Config config);
-    void run();
+    void loop();
 
 private:
     void adjustTimer(shared_ptr<heap_timer> timer);
@@ -49,15 +50,11 @@ private:
 
     vector<shared_ptr<http_conn>> users;
 
-    //数据库相关
-    string sql_user;    //登陆数据库用户名
-    string sql_passwd;  //登陆数据库密码
-    string sql_db_name; //使用数据库名
-    int sql_num;
 
     //线程池相关
     shared_ptr<threadpool<http_conn>> thread_pool;
     int thread_num;
+    int max_request;
 
     //epoll_event相关
     int epollfd;
@@ -66,7 +63,7 @@ private:
     int listenfd;
     int opt_linger;
 
-    //定时器相关
+    //定时器
     shared_ptr<TimeHeap> time_heap;
 
     //信号处理相关

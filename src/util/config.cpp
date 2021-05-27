@@ -15,12 +15,14 @@ Config::Config()
 
     //关闭日志,默认不关闭
     close_log = 0;
+
+    max_request = 10000;
 }
 
 void Config::parse_arg(int argc, char *argv[])
 {
     int opt;
-    const char *str = "p:l:s:t:c:";
+    const char *str = "p:l:s:t:c:r:";
     while ((opt = getopt(argc, argv, str)) != -1)
     {
         switch (opt)
@@ -48,6 +50,11 @@ void Config::parse_arg(int argc, char *argv[])
         case 'c':
         {
             close_log = atoi(optarg);
+            break;
+        }
+        case 'r':
+        {
+            max_request = atoi(optarg);
             break;
         }
         default:

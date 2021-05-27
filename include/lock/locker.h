@@ -4,7 +4,6 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <errno.h>
-#include "locker.h"
 #include "noncopyable.h"
 /* 封装信号量的类 */
 class sem : private Noncopyable

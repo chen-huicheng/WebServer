@@ -28,12 +28,10 @@ public:
     //线程池内的线程数量
     int thread_num;
 
+    int max_request;
+
     //是否关闭日志
     int close_log;
-
-    string sql_user;
-    string sql_passwd;
-    string sql_db_name;
 };
 
 #endif  //WEBSERVER_CONFIG_H_

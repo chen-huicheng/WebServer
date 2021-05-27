@@ -2,11 +2,10 @@
 #define WEBSERVER_THREAD_POOL_H_
 
 #include <list>
-#include <cstdio>
 #include <exception>
 #include <pthread.h>
+#include <stdio.h>
 #include "locker.h"
-#include "connection_pool.h"
 #include <vector>
 using namespace std;
 
@@ -25,20 +24,24 @@ private:
     void run();
 
 private:
-    int thread_number_;            //线程池中的线程数
-    uint max_requests_;            //请求队列中允许的最大请求数
-    vector<pthread_t> m_threads_;    //描述线程池的数组，其大小为m_thread_number
-    std::list<shared_ptr<T>> workqueue_;     //请求队列  TODO:多个队列实现
-    locker queuelocker_;           //保护请求队列的互斥锁
-    sem queuestat_;                //是否有任务需要处理
-    bool stop_;                    //是否结束线程
+    int thread_number_;                  //线程池中的线程数
+    uint max_requests_;                  //请求队列中允许的最大请求数
+    vector<pthread_t> m_threads_;        //描述线程池的数组，其大小为m_thread_number
+    std::list<shared_ptr<T>> workqueue_; //请求队列  TODO:多个队列实现
+    locker queuelocker_;                 //保护请求队列的互斥锁
+    sem queuestat_;                      //是否有任务需要处理
+    bool stop_;                          //是否结束线程
     bool is_init_;
 };
 template <typename T>
 threadpool<T>::threadpool(int thread_number, int max_requests) : thread_number_(thread_number), max_requests_(max_requests), stop_(false)
 {
     if (thread_number <= 0 || max_requests <= 0)
+    {
+        printf("threadpool init exception!!!\n");
         throw std::exception();
+    }
+        
     for (int i = 0; i < thread_number; ++i)
     {
         pthread_t tid;

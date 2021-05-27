@@ -4,19 +4,28 @@
 #include <time.h>
 #include <memory>
 #include <vector>
+#include <assert.h>
 using namespace std;
 class http_conn;
 
-//定时器类
+/*
+    定时器类
+    与http_conn类使用weak_ptr相互指向
+    避免shared_ptr循环引用造成无法释放
+    cb_func  ：定时器超时时调用的函数
+    expire   ：定时器的到期时间  绝对时间
+    user_data：指向定时器归属与那个用户
+    hole_    ：用于在时间堆中调制
+*/
 class heap_timer
 {
 public:
     heap_timer(int delay)
     {
         expire = time(NULL) + delay;
-        hole_=-1;
+        hole_ = -1;
         user_data.reset();
-        cb_func==nullptr;
+        cb_func = nullptr;
     }
     time_t expire;
     void (*cb_func)(shared_ptr<http_conn>);
@@ -24,50 +33,23 @@ public:
     int hole_;
 };
 
-//时间堆类
+/*
+    时间堆类
+    以vector为基础数据机构实现的一个时间堆
+    删除使用延迟删除策略，删除时仅是将定时器中的cb_func
+
+    线程不安全  
+*/
 class TimeHeap
 {
 public:
-    TimeHeap(int cap) : capacity(cap), cur_size(0)
+    TimeHeap(int cap) : capacity(cap), cur_size(0) //初始化
     {
-        array.assign(cap,nullptr);
+        array.assign(cap, nullptr);
     }
-    ~TimeHeap()
-    {
-        
-    }
-    bool add_timer(shared_ptr<heap_timer> timer)
-    {
-        if (!timer)
-            return false;
-        if (cur_size >= capacity - capacity / 20)
-        {
-            for (int i = 0; i < cur_size; i++)
-            {
-                if (NULL == array[i]->cb_func)
-                {
-                    array[i]->expire = 0;
-                    percolate_up(i);
-                }
-            }
-            tick();
-            assert(cur_size < capacity);
-        }
-        int hole = cur_size++;
-        array[hole] = timer;
-        array[hole]->hole_ = hole;
-        percolate_up(hole);
-        return true;
-    }
-    bool del_timer(shared_ptr<heap_timer> timer)
-    {
-        if (!timer)
-            return false;
-        timer->cb_func = nullptr;
-        timer->user_data.reset();
-        return true;
-    }
-    shared_ptr<heap_timer> top() const
+    bool add_timer(shared_ptr<heap_timer> timer); //添加一个定时器
+    bool del_timer(shared_ptr<heap_timer> timer);  //延迟销毁
+    shared_ptr<heap_timer> top() const //获得堆顶元素的指针
     {
         if (empty())
         {
@@ -75,103 +57,16 @@ public:
         }
         return array[0];
     }
-    void pop_timer()
-    {
-        if (empty())
-        {
-            return;
-        }
-        if (array[0])
-        {
-            array[0] = array[--cur_size];
-            array[0]->hole_ = 0;
-            percolate_down(0);
-        }
-    }
-    void tick()
-    {
-        time_t cur = time(NULL);
-        while (!empty())
-        {
-            if (!array[0])
-            {
-                pop_timer(); // TODO: break;
-                continue;
-            }
-            if (array[0]->expire > cur)
-            {
-                break;
-            }
-            if (array[0]->cb_func)
-            { 
-                array[0]->cb_func(array[0]->user_data.lock());
-            }
-            pop_timer();
-        }
-    }
-    bool adjustTimer(shared_ptr<heap_timer> timer, int delay)
-    {
-        if (!timer)
-            return false;
-        timer->expire = time(NULL) + delay;
-        if (delay > 0)
-        {
-            percolate_down(timer->hole_);
-        }
-        else
-        {
-            percolate_up(timer->hole_);
-        }
-        return true;
-    }
+    void pop_timer();   //删除堆顶元素 智能指针直接覆盖就行 不用手动销毁
+    void tick();        //心搏函数
+    bool adjustTimer(shared_ptr<heap_timer> timer, int delay);//调制时间  相对的向后向前延迟
     bool empty() const { return cur_size == 0; }
-    int size() const
-    {
-        return cur_size;
-    }
+    int size() const {return cur_size;}
 
 private:
-    void percolate_down(int hole)
-    {
-        shared_ptr<heap_timer> tmp = array[hole];
-        int child;
-        for (; (hole * 2 + 1) <= cur_size - 1; hole = child)
-        {
-            child = hole * 2 + 1;
-            if (child < (cur_size - 1) && (array[child + 1]->expire < array[child]->expire))
-            {
-                ++child;
-            }
-            if (array[child]->expire < tmp->expire)
-            {
-                array[hole] = array[child];
-                array[hole]->hole_ = hole;
-            }
-            else
-            {
-                break;
-            }
-        }
-        array[hole] = tmp;
-        array[hole]->hole_ = hole;
-    }
-    void percolate_up(int hole)
-    {
-        shared_ptr<heap_timer> tmp = array[hole];
-        int parent = 0;
-        for (; hole > 0; hole = parent)
-        {
-            parent = (hole - 1) / 2;
-            if (array[parent]->expire <= tmp->expire)
-            {
-                break;
-            }
-            array[hole] = array[parent];
-            array[hole]->hole_ = hole;
-        }
-        array[hole] = tmp;
-        array[hole]->hole_ = hole;
-    }
+    void percolate_down(int hole);//下虑操作
+    void percolate_up(int hole);//上虑操作
+    void adjust(); //调整堆  将已删除的节点进行上虑
     vector<shared_ptr<heap_timer>> array;
     int capacity;
     int cur_size;
