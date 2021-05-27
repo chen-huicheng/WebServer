@@ -7,7 +7,7 @@
 #include "locker.h"
 #include "noncopyable.h"
 /* 封装信号量的类 */
-class sem:private Noncopyable
+class sem : private Noncopyable
 {
 public:
     //初始化一个为0的信号量
@@ -48,7 +48,7 @@ private:
 };
 
 /* 封装互斥锁的类 */
-class locker:private Noncopyable
+class locker : private Noncopyable
 {
 public:
     locker()

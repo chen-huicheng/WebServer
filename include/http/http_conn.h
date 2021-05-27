@@ -33,26 +33,19 @@ class http_conn
 public:
     static const int FILENAME_LEN = 200;
     static const int READ_BUFFER_SIZE = 2048;
-    static const int WRITE_BUFFER_SIZE = 1024;
-    enum METHOD
+    static const int WRITE_BUFFER_SIZE = 2048;
+    enum METHOD    //http 头部方法
     {
         GET = 0,
-        POST,
-        HEAD,
-        PUT,
-        DELETE,
-        TRACE,
-        OPTIONS,
-        CONNECT,
-        PATH
+        POST
     };
-    enum CHECK_STATE
+    enum CHECK_STATE //http请求解析状态
     {
         CHECK_STATE_REQUESTLINE = 0,
         CHECK_STATE_HEADER,
         CHECK_STATE_CONTENT
     };
-    enum HTTP_CODE
+    enum HTTP_CODE  //响应码
     {
         NO_REQUEST,
         GET_REQUEST,
@@ -93,7 +86,7 @@ public:
     void close_conn();
 
 private:
-    void init();
+    void init();  //初始化
     HTTP_CODE process_read();
     bool process_write(HTTP_CODE ret);
     HTTP_CODE parse_request_line(char *text);

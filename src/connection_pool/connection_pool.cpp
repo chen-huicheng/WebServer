@@ -1,11 +1,11 @@
 #include "connection_pool.h"
 #include <algorithm>
 #include <log.h>
-ConnectionPool::ConnectionPool():reserve_(0)
+ConnectionPool::ConnectionPool() : reserve_(0)
 {
     max_conn_ = 0;
     free_conn_ = 0;
-    is_init_= false;
+    is_init_ = false;
 }
 
 // TODO:外部关闭内部会报错 多次关闭 封装性
@@ -30,13 +30,14 @@ ConnectionPool *ConnectionPool::GetInstance()
 
 void ConnectionPool::init(std::string host, std::string user, std::string passwd, std::string db_name, int port, int max_conn)
 {
-    if(is_init_){
+    if (is_init_)
+    {
         LOG_WARN("Connection pool has been initialized\n");
-        fprintf(stderr,"Connection pool has been initialized\n");
+        fprintf(stderr, "Connection pool has been initialized\n");
         return;
     }
-        
-    is_init_=true;
+
+    is_init_ = true;
     host_ = host;
     user_ = user;
     port_ = port;

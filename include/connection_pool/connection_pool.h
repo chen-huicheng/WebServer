@@ -40,7 +40,7 @@ private:
     bool is_init_;        //是否初始化   仅能初始化一次  因此只能链接一个数据库
 };
 
-class Connection:Noncopyable
+class Connection : Noncopyable
 {
 public:
     MYSQL *GetConn() const
@@ -49,6 +49,7 @@ public:
     }
     Connection();
     ~Connection();
+
 private:
     MYSQL *conn_;
 };
