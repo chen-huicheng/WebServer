@@ -10,7 +10,7 @@
 
 #include "locker.h"
 #include "noncopyable.h"
-#include "log.h"
+#include "logger.h"
 const int MIN_CONN_NUM = 3; //数据库最少链接数
 
 class ConnectionPool

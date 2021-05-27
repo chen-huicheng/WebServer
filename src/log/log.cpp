@@ -1,4 +1,4 @@
-#include "log.h"
+#include "logger.h"
 
 string Log::levelstr(LOGLEVEL level)
 {
