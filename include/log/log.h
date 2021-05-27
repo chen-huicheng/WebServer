@@ -6,6 +6,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include "locker.h"
+#include "logstream.h"
 
 using namespace std;
 
@@ -26,9 +27,7 @@ public:
         static Log instance;
         return &instance;
     }
-
-    //可选择的参数有日志文件、日志缓冲区大小、最大行数以及最长日志条队列
-    bool init(const char *file_name, int close_log, int log_buf_size = 8192, int log_max_lines_ = 5000000, LOGLEVEL level = INFO);
+    bool init(string filename, bool close_log, size_t log_buf_size = 8192, size_t log_max_lines = 5000000, LOGLEVEL level = INFO);
 
     void write_log(LOGLEVEL level, const char *msg, ...);
 
@@ -44,24 +43,16 @@ public:
     }
 
 private:
-    Log();
-    ~Log();
-    const char *levelstr(LOGLEVEL level);
+    Log(){};
+    ~Log(){};
+    string levelstr(LOGLEVEL level);
+    
 
 private:
-    char dir_name_[128];  //路径名
-    char log_name_[128];  //log文件名
-    int log_max_lines_;   //日志最大行数
-    int log_buf_size_;    //日志缓冲区大小
-    long long log_lines_; //日志行数记录
-    int today;            //因为按天分类,记录当前时间是那一天
-    FILE *fp;             //打开log的文件指针
-    char *buf;
-    char *next_buf;
-    int buf_cur_idx;
-    locker mutex;
-    bool close_log_;
-    LOGLEVEL cur_level_; //默认 INFO
+    bool close_log_;        //是否关闭日志
+    LOGLEVEL cur_level_;    //默认 INFO
+    LogStream logstream_;   //缓冲区 延迟写入到文件
+    const int log_buf_size_=1024; //日志buf大小
 };
 
 #define LOG_DEBUG(msg, args...)                             \

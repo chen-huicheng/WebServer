@@ -47,15 +47,15 @@ void WebServer::initIO()
 
     http_conn::m_epollfd = epollfd;
 
-    addfd(epollfd, listenfd, false);//ET mode
+    // addfd(epollfd, listenfd, false);//ET mode
     //设置 listenfd LT触发
-    // epoll_event event;
-    // event.data.fd = listenfd;
+    epoll_event event;
+    event.data.fd = listenfd;
 
-    // event.events = EPOLLIN | EPOLLRDHUP;
+    event.events = EPOLLIN | EPOLLRDHUP;
 
-    // epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &event);
-    // setnonblocking(listenfd);
+    epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &event);
+    setnonblocking(listenfd);
 
     Sig::init(epollfd);
     Sig::AddSignal();
@@ -208,7 +208,8 @@ void WebServer::loop()
             //处理新到的客户连接
             if (sockfd == listenfd)
             {
-                while(acceptClient());
+                acceptClient();
+                // while(acceptClient());
             }
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
             {
@@ -237,7 +238,6 @@ void WebServer::loop()
             int size = time_heap->size();
             time_heap->tick();
             LOG_INFO("timer tick time_heap.size = %d(before):%d\n", size, time_heap->size());
-            LOG_FLUSH();
             time_t tmp = TIMESLOT;
             if (!time_heap->empty() && time_heap->top()->expire < tmp)
             {
