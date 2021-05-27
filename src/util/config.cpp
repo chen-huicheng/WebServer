@@ -14,7 +14,7 @@ Config::Config()
     thread_num = 8;
 
     //关闭日志,默认不关闭
-    close_log = 1;
+    close_log = 0;
 
     max_request = 10000;
 }
