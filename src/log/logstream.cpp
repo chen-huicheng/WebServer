@@ -27,6 +27,7 @@ void LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
 
     buf_size_ += 1024;
     buf_size_ &= ~1023;
+    printf("log buf size:%d\n", buf_size_);
     buf_ = new char[buf_size_];
     next_buf_ = new char[buf_size_];
     write_buf_ = nullptr;
@@ -69,6 +70,7 @@ int LogStream::write(char *line, int len)
             fputs(buf_, fp_);
             fflush(fp_);
             fmutex.unlock();
+            printf("%d\n",cur_lines_);
         }
         else
         {
@@ -80,7 +82,7 @@ int LogStream::write(char *line, int len)
     }
     strncpy(buf_ + buf_in_, line, len);
     buf_in_ += len;
-    lines_++;
+    cur_lines_++;
     mutex.unlock();
 }
 int LogStream::flush()
@@ -102,18 +104,20 @@ void LogStream::run()
     {
         cond_.wait();
         flushWriteBuf();
-        if (lines_ > max_lines_)
+        if (cur_lines_ > max_lines_)
         {
             if (getTime() == today_)
             {
-                full_name_ = pre_filename_ + "_" + getTime() + "_" + to_string(num_) + ".log";
+                full_name_ = pre_filename_ + "_" + today_ + "_" + to_string(num_) + ".log";
                 num_++;
             }
             else
             {
-                full_name_ = pre_filename_ + "_" + today_ + ".log";
+                today_ = getTime();
+                full_name_ = pre_filename_ + "_" + today_ + "_" + to_string(num_) + ".log";
                 num_ = 0;
             }
+            cur_lines_ = 0;
             FILE *fp = fopen(full_name_.c_str(), "ae");
             fmutex.lock();
             FILE *tmp = fp_;
@@ -135,7 +139,7 @@ int LogStream::flushWriteBuf()
     }
     fmutex.unlock();
 }
-static void *LogStream::writeToFile(void *arg)
+void *LogStream::writeToFile(void *arg)
 {
     LogStream *logstream = (LogStream *)arg;
     logstream->run();

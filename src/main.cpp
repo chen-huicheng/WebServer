@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
 
     //日志初始化
     string log_pre_filename="Serverlog";
-    const int log_buf_size=4086;
+    
+    const int log_buf_size=1024*4*16;
     const int log_max_lines=1000000;
     Log::get_instance()->init(log_pre_filename, config.close_log, log_buf_size, log_max_lines);
 

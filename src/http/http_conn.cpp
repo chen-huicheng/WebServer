@@ -379,7 +379,6 @@ bool http_conn::write()
             unmap();
             return false;
         }
-        //TODO:大文件测试   去掉下边
         bytes_have_send += temp;
         bytes_to_send -= temp;
         if (bytes_have_send >= m_iv[0].iov_len)

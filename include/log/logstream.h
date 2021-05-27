@@ -31,7 +31,6 @@ private:
     size_t buf_in_;    //当前日志待写入位置
     size_t buf_out_;   //可输出位置
     size_t max_lines_; //日志最大行数
-    size_t lines_;
     size_t buf_size_;  //日志缓冲区大小
     size_t cur_lines_; //日志行数记录
 
