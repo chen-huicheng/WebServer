@@ -20,6 +20,7 @@
 #include "config.h"
 #include "timer.h"
 #include "util.h"
+#include "logger.h"
 
 const int MAX_FD = 65536;           //最大文件描述符
 const int MAX_EVENT_NUMBER = 10000; //最大事件数

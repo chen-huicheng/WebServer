@@ -245,6 +245,7 @@ void WebServer::loop()
             LOG_INFO("timer tick time_heap.size = %d(before):%d\n", size, time_heap->size());
             // printf("keep-alive nums:%d\n",time_heap->size());
             // printf("\033[1A\n");
+            LOG_FLUSH();
             time_t tmp = TIMESLOT;
             if (!time_heap->empty() && time_heap->top()->expire < tmp)
             {

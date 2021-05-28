@@ -1,6 +1,6 @@
 #include "logger.h"
 
-string Log::levelstr(LOGLEVEL level)
+string Logger::levelstr(LOGLEVEL level)
 {
     switch (level)
     {
@@ -17,17 +17,17 @@ string Log::levelstr(LOGLEVEL level)
     }
 }
 
-bool Log::init(string file_name, bool close_log, size_t log_buf_size, size_t log_max_lines, LOGLEVEL level)
+bool Logger::init(string file_name, bool close_log, size_t log_buf_size, size_t log_max_lines, LOGLEVEL level)
 {
-    logstream_.init(file_name,log_buf_size,log_max_lines);
+    logstream_.init(file_name, log_buf_size, log_max_lines);
     close_log_ = close_log;
     cur_level_ = level;
 }
 
-void Log::write_log(LOGLEVEL level, const char *msg, ...)
+void Logger::write_log(LOGLEVEL level, const char *msg, ...)
 {
-    char buf[1024]={0};
-    int buf_cur_idx=0;
+    char buf[1024] = {0}; //日志buf
+    int buf_cur_idx = 0;
     if (level < cur_level_ || close_log_)
         return;
     time_t t = time(NULL);
@@ -42,8 +42,8 @@ void Log::write_log(LOGLEVEL level, const char *msg, ...)
 
     //写入的具体时间内容格式
     int rt = snprintf(buf + buf_cur_idx, 48, "%d-%02d-%02d %02d:%02d:%02d %s ",
-                     my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday,
-                     my_tm.tm_hour, my_tm.tm_min, my_tm.tm_sec, str.c_str());
+                      my_tm.tm_year + 1900, my_tm.tm_mon + 1, my_tm.tm_mday,
+                      my_tm.tm_hour, my_tm.tm_min, my_tm.tm_sec, str.c_str());
 
     buf_cur_idx += rt;
 
@@ -51,16 +51,18 @@ void Log::write_log(LOGLEVEL level, const char *msg, ...)
     if (rt + buf_cur_idx >= log_buf_size_ || rt < 0)
     {
         printf("log is too long can't write to logbuf!!\n");
-        buf[log_buf_size_-1]='\0';
-        printf("log:%s\n",buf);
+        buf[log_buf_size_ - 1] = '\0';
+        printf("log:%s\n", buf);
     }
-     buf_cur_idx += rt;
-    logstream_.write(buf,buf_cur_idx);
+    buf_cur_idx += rt;
+    //调用logstream写入具体内容
+    logstream_.write(buf, buf_cur_idx);
 
     va_end(valst);
 }
 
-void Log::flush(void)
+void Logger::flush(void)
 {
+    //调用logstream的flush刷新缓冲区
     logstream_.flush();
 }
