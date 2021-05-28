@@ -16,10 +16,14 @@ const int MIN_CONN_NUM = 3; //数据库最少链接数
 class ConnectionPool
 {
 public:
+    //单例模式 固定借口
     static ConnectionPool *GetInstance();
-    void init(std::string url, std::string user, std::string password, std::string db_name, int port, int max_conn);
-    MYSQL *GetConnection();              //获取数据库连接
-    bool ReleaseConnection(MYSQL *conn); //释放连接
+    //初始化数据库连接  url:数据库地址  user:用户名  passwd:密码  db_name:数据库名  port:端口号  max_conn:在连接池中初始化多少连接
+    void init(std::string url, std::string user, std::string passwd, std::string db_name, int port, int max_conn);
+    //获取数据库连接
+    MYSQL *GetConnection();
+    //释放连接
+    bool ReleaseConnection(MYSQL *conn); 
     int GetMaxConn()
     {
         return max_conn_;
@@ -43,9 +47,13 @@ private:
     bool is_init_;        //是否初始化   仅能初始化一次  因此只能链接一个数据库
 };
 
+//使用 Connection 类来管理连接 
+//构建函数 从连接池中获取连接
+//析构函数 释放连接到连接池
 class Connection : Noncopyable
 {
 public:
+    //供用户使用的借口
     MYSQL *GetConn() const
     {
         return conn_;

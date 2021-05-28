@@ -58,7 +58,7 @@ public:
         INTERNAL_ERROR,
         CLOSED_CONNECTION
     };
-    enum LINE_STATUS
+    enum LINE_STATUS //行解析状态
     {
         LINE_OK = 0,
         LINE_BAD,

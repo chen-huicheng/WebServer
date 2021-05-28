@@ -542,7 +542,11 @@ void http_conn::process()
     {
         close_conn();
     }
-    modfd(m_epollfd, m_sockfd, EPOLLOUT);
+    if(!write())
+    {
+        close_conn();
+    }
+    // modfd(m_epollfd, m_sockfd, EPOLLOUT);
 }
 
 void http_conn::run()

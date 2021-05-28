@@ -142,6 +142,11 @@ bool WebServer::dealSignal()
                 stop_server = true;
                 break;
             }
+            case SIGINT:
+            {
+                stop_server = true;
+                break;
+            }
             default:
             {
                 LOG_INFO("get other signal ,deal with default\n");
@@ -238,6 +243,8 @@ void WebServer::loop()
             int size = time_heap->size();
             time_heap->tick();
             LOG_INFO("timer tick time_heap.size = %d(before):%d\n", size, time_heap->size());
+            // printf("keep-alive nums:%d\n",time_heap->size());
+            // printf("\033[1A\n");
             time_t tmp = TIMESLOT;
             if (!time_heap->empty() && time_heap->top()->expire < tmp)
             {

@@ -12,6 +12,9 @@ LogStream::LogStream()
 LogStream::~LogStream()
 {
     stop = true;
+    cond_.signal();
+    flush();
+    fclose(fp_);
     delete buf_;
     delete next_buf_;
     delete write_buf_;
@@ -22,7 +25,7 @@ void LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
     max_lines_ = max_lines;
     buf_size_ = buf_size;
     today_ = getTime();
-    full_name_ = pre_filename_ + "_" + today_ + ".log";
+    full_name_ = pre_filename_ + "_" + today_ + "_" + to_string(num_) + ".log";
     fp_ = fopen(full_name_.c_str(), "ae");
 
     buf_size_ += 1024;
@@ -112,10 +115,11 @@ void LogStream::run()
                 num_++;
             }
             else
-            {
+            {   
+                num_ = 0;
                 today_ = getTime();
                 full_name_ = pre_filename_ + "_" + today_ + "_" + to_string(num_) + ".log";
-                num_ = 0;
+                
             }
             cur_lines_ = 0;
             FILE *fp = fopen(full_name_.c_str(), "ae");
@@ -153,6 +157,6 @@ string LogStream::getTime()
 
     sys_time = localtime(&t);
 
-    strftime(buffer, 60, "%Y-%m-%d", sys_time);
+    strftime(buffer, 60, "%Y_%m_%d", sys_time);
     return buffer;
 }

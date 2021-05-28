@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <unistd.h>
 #include "noncopyable.h"
 #include "locker.h"
 using namespace std;

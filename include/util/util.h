@@ -65,8 +65,10 @@ public:
     {
         //添加信号处理函数
         addsig(SIGPIPE, SIG_IGN);
+
         addsig(SIGALRM, sig_handler, true);
         addsig(SIGTERM, sig_handler, true);
+        addsig(SIGINT,sig_handler,true);
         return true;
     }
     static void sig_handler(int sig)
