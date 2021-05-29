@@ -135,7 +135,7 @@ void LogStream::run()
         }
     }
 }
-int LogStream::flushWriteBuf()　//刷新　write_buf_
+int LogStream::flushWriteBuf() //刷新　write_buf_
 {
     fmutex.lock();
     if (nullptr != write_buf_)

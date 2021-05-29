@@ -1,20 +1,19 @@
 #ifndef WEBSERVER_UTIL_H_
 #define WEBSERVER_UTIL_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 #include <map>
 #include <memory>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
-#include <string.h>
+#include <cstring>
 #include <unistd.h>
 #include <signal.h>
-#include <assert.h>
 
 #include "connection_pool.h"
 #include "http_conn.h"
@@ -57,7 +56,10 @@ public:
     {
         epollfd = epollfd_;
         int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, pipefd);
-        assert(ret != -1);
+        if(ret==-1){
+            printf("create socketpait faild");
+            abort();
+        }
         setnonblocking(pipefd[0]);
         addfd(epollfd, pipefd[0], false);
     }

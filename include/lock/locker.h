@@ -65,8 +65,9 @@ public:
     {
         return pthread_mutex_lock(&m_mutex) == 0;
     }
+    //如果目标可以加锁，对目标加锁，不能加锁返回false
     bool trylock()
-    { //如果目标可以加锁，对目标加锁，不能加锁返回false
+    { 
         return pthread_mutex_trylock(&m_mutex) == 0;
     }
     bool unlock()

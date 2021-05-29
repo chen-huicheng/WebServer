@@ -1,10 +1,10 @@
 #ifndef WEBSERVER_THREAD_POOL_H_
 #define WEBSERVER_THREAD_POOL_H_
 
+#include <pthread.h>
 #include <list>
 #include <exception>
-#include <pthread.h>
-#include <stdio.h>
+#include <cstdio>
 #include "locker.h"
 #include <vector>
 using namespace std;
@@ -65,12 +65,13 @@ threadpool<T>::~threadpool()
 template <typename T>
 bool threadpool<T>::append(shared_ptr<T> request)
 {
-    queuelocker_.lock();
+    // queuelocker_.lock();
     if (workqueue_.size() >= max_requests_)
     {
-        queuelocker_.unlock();
+        // queuelocker_.unlock();
         return false;
     }
+    queuelocker_.lock();
     workqueue_.push_back(request);
     queuelocker_.unlock();
     queuestat_.post();

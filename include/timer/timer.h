@@ -4,7 +4,7 @@
 #include <time.h>
 #include <memory>
 #include <vector>
-#include <assert.h>
+#include <cassert>
 using namespace std;
 class http_conn;
 

@@ -2,16 +2,17 @@
 #define WEBSERVER_LOG_STREAM_H_
 
 #include <string>
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstring>
+#include <cassert>
 #include <unistd.h>
 #include "noncopyable.h"
 #include "locker.h"
 using namespace std;
 
-/*  异步日志核心　logger 调用　LogStream　将日志写入到缓冲区
-    核心思想：使用两个缓冲区，当一个缓冲区写满是，写另外一个缓冲，同时将写满的缓冲写入磁盘 
+/*  异步日志　logger 调用　LogStream　将日志写入到缓冲区
+    核心思想：使用两个缓冲区，当一个缓冲区写满是，写另外一个缓冲，
+            同时写入线程将写满的缓冲写入磁盘，不阻塞当前线程
 */
 class LogStream : Noncopyable
 {

@@ -41,9 +41,16 @@ void WebServer::init(Config config)
 void WebServer::initIO()
 {
     listenfd = open_listenfd(port);
+    if(setnonblocking(listenfd)==-1){
+        printf("set socket non block failed:");
+        abort();
+    }
 
     epollfd = epoll_create(5);
-    assert(epollfd != -1);
+    if(-1 == epollfd){
+         printf("create epollfd failed:");
+        abort();
+    }
 
     http_conn::m_epollfd = epollfd;
 

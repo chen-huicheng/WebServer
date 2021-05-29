@@ -1,10 +1,9 @@
 #ifndef WEBSERVER_CONNECTION_POOL_H_
 #define WEBSERVER_CONNECTION_POOL_H_
 
-#include <stdio.h>
+#include <cstdio>
 #include <list>
 #include <mysql/mysql.h>
-#include <error.h>
 #include <string>
 #include <algorithm>
 

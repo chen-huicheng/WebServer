@@ -1,5 +1,7 @@
 #include "config.h"
 #include "webserver.h"
+#include "logger.h"
+#include "connection_pool.h"
 #include <string>
 using namespace std;
 int main(int argc, char *argv[])
@@ -24,8 +26,8 @@ int main(int argc, char *argv[])
     Logger::get_instance()->init(log_pre_filename, config.close_log, log_buf_size, log_max_lines);
 
 
-    WebServer server;
     //webserver初始化
+    WebServer server;
     server.init(config);
     printf("using port:%d\n", config.port);
     //运行

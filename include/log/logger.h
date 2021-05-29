@@ -1,8 +1,8 @@
 #ifndef WEBSERVER_LOG_H_
 #define WEBSERVER_LOG_H_
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
 #include <time.h>
 #include <sys/time.h>
 #include "locker.h"
