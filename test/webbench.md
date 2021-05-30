@@ -19,20 +19,45 @@ R-->输出统计数据
 
 Usage:
 
-> |      参数      |                         用法                         |
-> | :------------: | :--------------------------------------------------: |
-> |       -f       | 不等待服务器回复，子进程发送完数据直接关闭文件描述符 |
-> |       -t       |                测试运行时间，默认30s                 |
-> |       -c       |              模拟多少个客户端，默认1个               |
-> |       -9       |              使用http0.9协议来构造请求               |
-> |       -1       |              使用http1.0协议来构造请求               |
-> |       -2       |              使用http1.1协议来构造请求               |
-> |     --get      |                     使用GET请求                      |
-> |     --head     |                     使用HEAD请求                     |
-> |   --options    |                   使用OPTIONS请求                    |
-> |    --trance    |                    使用TRACE请求                     |
-> | -?\|-h\|--help |                     显示帮助信息                     |
->
-> ``` shell
-> ./webbench -t 5 -c 5000 -2 --get http://127.0.0.1:12345/
-> ```
+|      参数      |                         用法                         |
+| :------------: | :--------------------------------------------------: |
+|       -f       | 不等待服务器回复，子进程发送完数据直接关闭文件描述符 |
+|       -t       |                测试运行时间，默认30s                 |
+|       -c       |              模拟多少个客户端，默认1个               |
+|       -9       |              使用http0.9协议来构造请求               |
+|       -1       |              使用http1.0协议来构造请求               |
+|       -2       |              使用http1.1协议来构造请求               |
+|     --get      |                     使用GET请求                      |
+|     --head     |                     使用HEAD请求                     |
+|     --post     |                     使用POST请求                     |
+|     -m         |                     POST message                     |
+|   --options    |                   使用OPTIONS请求                    |
+|    --trance    |                    使用TRACE请求                     |
+| -?\|-h\|--help |                     显示帮助信息                     |
+
+``` shell
+ ./webbench -t 5 -c 5000 -2 --get http://127.0.0.1:12345/   //get 方法
+```
+
+**HTTP请求**
+
+GET / HTTP/1.1
+User-Agent: WebBench 1.5
+Host: 127.0.0.1
+Connection: close
+
+
+
+```
+./webbench -t 5 -c 5000 -2  -m "username=root&passwd=123" --post http://127.0.0.1:12345/
+```
+
+**HTTP请求**
+
+POST / HTTP/1.1
+User-Agent: WebBench 1.5
+Host: 127.0.0.1
+Connection: close
+Content-Length: 24
+
+username=root&passwd=123

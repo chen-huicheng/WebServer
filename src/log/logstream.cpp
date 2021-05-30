@@ -31,7 +31,7 @@ void LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
     full_name_ = pre_filename_ + "_" + today_ + "_" + to_string(num_) + ".log";
     fp_ = fopen(full_name_.c_str(), "ae");
 
-    buf_size_ += 1024;
+    buf_size_ += 1023;
     buf_size_ &= ~1023;
     printf("log buf size:%d\n", buf_size_);
     buf_ = new char[buf_size_];      //新建一个日志缓冲池

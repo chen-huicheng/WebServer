@@ -176,9 +176,7 @@ int main(int argc, char *argv[])
          clients = atoi(optarg);
          break;
       case 'm':
-         printf(optarg);
          strcpy(message,optarg);
-         printf(message);
          break;
       }
    }

@@ -1,4 +1,5 @@
 #include "config.h"
+#include "util.h"
 Config::Config()
 {
     //端口号,默认1234
@@ -23,7 +24,7 @@ Config::Config()
 void Config::parse_arg(int argc, char *argv[])
 {
     int opt;
-    const char *str = "p:l:s:t:c:r:";
+    const char *str = "p:l:s:t:cr:";
     while ((opt = getopt(argc, argv, str)) != -1)
     {
         switch (opt)
@@ -50,7 +51,7 @@ void Config::parse_arg(int argc, char *argv[])
         }
         case 'c':
         {
-            close_log = atoi(optarg);
+            close_log = true;
             break;
         }
         case 'r':
