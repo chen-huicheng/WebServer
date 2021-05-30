@@ -19,9 +19,14 @@ string Logger::levelstr(LOGLEVEL level)
 
 bool Logger::init(string file_name, bool close_log, size_t log_buf_size, size_t log_max_lines, LOGLEVEL level)
 {
-    logstream_.init(file_name, log_buf_size, log_max_lines);
     close_log_ = close_log;
     cur_level_ = level;
+    if(!logstream_.init(file_name, log_buf_size, log_max_lines))
+    {
+        printf("logger init failed!!");
+        return false;
+    }
+    return true;
 }
 
 void Logger::write_log(LOGLEVEL level, const char *msg, ...)

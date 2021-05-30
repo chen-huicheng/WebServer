@@ -74,6 +74,7 @@ public:
         errno = save_errno;
     }
 };
+<<<<<<< HEAD
 static void usage()
 {
    fprintf(stderr,
@@ -85,4 +86,7 @@ static void usage()
            "  -l    是否使用优雅关闭连接  (1是 0否 默认:0 不使用).\n",
            "  -c    关闭日志.\n");
 }
+=======
+void usage();
+>>>>>>> 031018a4d790bd0a53edc48b85a5194f1559b5f3
 #endif //WEBSERVER_UTIL_H_

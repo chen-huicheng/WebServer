@@ -20,9 +20,9 @@ public:
     LogStream();
     ~LogStream();
     //初始化日志缓冲　日志文件前缀名　缓冲区大小　日志文件最大行数
-    void init(string pre_filename, size_t buf_size, size_t max_lines);
+    bool init(string pre_filename, size_t buf_size, size_t max_lines);
     //写入日志文件到缓冲区
-    int write(char *line, int len);
+    int write(char *line, size_t len);
     //刷新缓冲区
     int flush();
 
