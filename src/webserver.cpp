@@ -65,7 +65,10 @@ void WebServer::initIO()
     setnonblocking(listenfd);
 
     Sig::init(epollfd);
-    Sig::AddSignal();
+    addsig(SIGPIPE, SIG_IGN);
+    Sig::AddSignal(SIGALRM);
+    Sig::AddSignal(SIGTERM);
+    Sig::AddSignal(SIGINT);
     alarm(TIMESLOT);
 
     time_heap = make_shared<TimeHeap>(MAX_FD);

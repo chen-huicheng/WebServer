@@ -132,7 +132,7 @@ http_conn::LINE_STATUS http_conn::parse_line()
 }
 
 //解析http请求行，获得请求方法，目标url及http版本号
-http_conn::HTTP_CODE http_conn::parse_request_line(char *text) //TODO:  https 无法解析
+http_conn::HTTP_CODE http_conn::parse_request_line(char *text) 
 {
     //char *strpbrk(const char *str1, const char *str2) 检索字符串 str1 中第一个匹配字符串 str2 中字符的字符，不包含空结束字符'\0'。
     m_url = strpbrk(text, " \t");
@@ -296,7 +296,7 @@ http_conn::HTTP_CODE http_conn::do_post_request()
         string username = kv_pair["username"];
         string passwd = kv_pair["passwd"];
 
-        if (login_u(username, passwd))
+        if (login_user(username, passwd))
         {
             m_url = "/pages/welcome.html";
         }
@@ -309,7 +309,7 @@ http_conn::HTTP_CODE http_conn::do_post_request()
     {
         string username = kv_pair["username"];
         string passwd = kv_pair["passwd"];
-        if (register_u(username, passwd))
+        if (register_user(username, passwd))
         {
             m_url = "/pages/welcome.html";
         }
@@ -542,7 +542,7 @@ void http_conn::process()
     {
         close_conn();
     }
-    if(!write())
+    if (!write())
     {
         close_conn();
     }

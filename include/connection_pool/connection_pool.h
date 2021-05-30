@@ -15,7 +15,7 @@ const int MIN_CONN_NUM = 3; //数据库最少链接数
 class ConnectionPool
 {
 public:
-    //单例模式 固定借口
+    //单例模式 
     static ConnectionPool *GetInstance();
     //初始化数据库连接  url:数据库地址  user:用户名  passwd:密码  db_name:数据库名  port:端口号  max_conn:在连接池中初始化多少连接
     void init(std::string url, std::string user, std::string passwd, std::string db_name, int port, int max_conn);

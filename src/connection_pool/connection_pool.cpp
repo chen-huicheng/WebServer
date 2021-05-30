@@ -7,7 +7,6 @@ ConnectionPool::ConnectionPool() : reserve_(0)
     is_init_ = false;
 }
 
-// TODO:外部关闭内部会报错 多次关闭 封装性
 ConnectionPool::~ConnectionPool()
 {
     lock_.lock();

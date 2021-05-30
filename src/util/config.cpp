@@ -10,12 +10,13 @@ Config::Config()
     //数据库连接池数量,默认8
     sql_num = 8;
 
-    //线程池内的线程数量,默认8
-    thread_num = 8;
+    //线程池内的线程数量,默认5
+    thread_num = 5;
 
     //关闭日志,默认不关闭
     close_log = 0;
 
+    //请求队列中最大请求数量
     max_request = 10000;
 }
 
@@ -58,6 +59,8 @@ void Config::parse_arg(int argc, char *argv[])
             break;
         }
         default:
+            usage();
+            abort();
             break;
         }
     }

@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <string>
+#include "util.h"
 using namespace std;
 
 class Config
@@ -28,11 +29,11 @@ public:
     //线程池内的线程数量
     int thread_num;
 
-    //请求队列中最大请求数量
-    int max_request;
-
     //是否关闭日志
     int close_log;
+
+    //请求队列中最大请求数量
+    int max_request;
 };
 
 #endif  //WEBSERVER_CONFIG_H_

@@ -1,5 +1,6 @@
 #include "util.h"
-
+#include "connection_pool.h"
+#include "http_conn.h"
 const int MAX_BUFF = 4096;
 
 int Sig::pipefd[2];
@@ -8,7 +9,7 @@ int Sig::epollfd;
 //将文件描述符设置非阻塞
 int setnonblocking(int fd)
 {
-    int old_option = fcntl(fd, F_GETFL,0);
+    int old_option = fcntl(fd, F_GETFL, 0);
     int new_option = old_option | O_NONBLOCK;
     fcntl(fd, F_SETFL, new_option);
     return old_option;
@@ -92,7 +93,6 @@ int open_listenfd(int port)
     return listen_fd;
 }
 
-
 //重置fd上事件
 void reset_oneshot(int epollfd, int fd)
 {
@@ -102,7 +102,7 @@ void reset_oneshot(int epollfd, int fd)
     event.events = EPOLLIN | EPOLLET | EPOLLRDHUP | EPOLLONESHOT;
     epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &event);
 }
-
+//关闭http_conn连接的回调函数
 void close_http_conn_cb_func(shared_ptr<http_conn> user)
 {
     if (user == nullptr)
@@ -112,6 +112,7 @@ void close_http_conn_cb_func(shared_ptr<http_conn> user)
     close(user->getSockfd());
     http_conn::m_user_count--;
 }
+//解析post 表单字符串
 map<string, string> parse_form(string str)
 {
     map<string, string> kv;
@@ -144,8 +145,8 @@ map<string, string> parse_form(string str)
     }
     return kv;
 }
-
-bool login_u(string username, string passwd)
+//用户登录验证函数
+bool login_user(string username, string passwd)
 {
     Connection conn;
     string select_sql = "select * from user where username='" + username + "' and passwd='" + passwd + "'";
@@ -156,17 +157,19 @@ bool login_u(string username, string passwd)
     }
     MYSQL_RES *res;
     res = mysql_store_result(conn.GetConn());
-    // printf("%d\n", mysql_num_rows(res));
-    fflush(stdout);
     if (mysql_num_rows(res))
+    {
+        // free(res);
         return true;
+    }
     else
     {
+        // free(res);
         return false;
     }
-    fflush(stdout);
 }
-bool register_u(string username, string passwd)
+//用户注册验证函数
+bool register_user(string username, string passwd)
 {
     Connection conn;
     string insert_sql = "insert into user select '" + username + "','" + passwd + "'";
@@ -188,7 +191,7 @@ bool register_u(string username, string passwd)
         return false;
     }
 }
-
+//添加信号
 void addsig(int sig, void(handler)(int), bool restart)
 {
     struct sigaction sa;

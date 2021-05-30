@@ -35,7 +35,7 @@ public:
     static const int FILENAME_LEN = 200;
     static const int READ_BUFFER_SIZE = 2048;
     static const int WRITE_BUFFER_SIZE = 2048;
-    enum METHOD    //http 头部方法
+    enum METHOD //http 头部方法
     {
         GET = 0,
         POST
@@ -46,7 +46,7 @@ public:
         CHECK_STATE_HEADER,
         CHECK_STATE_CONTENT
     };
-    enum HTTP_CODE  //响应码
+    enum HTTP_CODE //响应码
     {
         NO_REQUEST,
         GET_REQUEST,
@@ -87,7 +87,7 @@ public:
     void close_conn();
 
 private:
-    void init();  //初始化
+    void init(); //初始化
     HTTP_CODE process_read();
     bool process_write(HTTP_CODE ret);
     HTTP_CODE parse_request_line(char *text);
@@ -123,18 +123,18 @@ private:
 private:
     int m_sockfd;
     sockaddr_in m_address;
-    char m_read_buf[READ_BUFFER_SIZE];
-    int m_read_idx;
-    int m_checked_idx;
-    int m_start_line;
-    char m_write_buf[WRITE_BUFFER_SIZE];
-    int m_write_idx;
-    CHECK_STATE m_check_state;
-    METHOD m_method;
-    char m_real_file[FILENAME_LEN];
-    char *m_url;
-    char *m_version;
-    char *m_host;
+    char m_read_buf[READ_BUFFER_SIZE];   //读缓冲区
+    int m_read_idx;                      //已读取数据的下一个字符位置
+    int m_checked_idx;                   //当前解析字符位置
+    int m_start_line;                    //当前解析行第一个字符
+    char m_write_buf[WRITE_BUFFER_SIZE]; //写缓冲区
+    int m_write_idx;                     //已写缓冲长度
+    CHECK_STATE m_check_state;           //主状态机当前状态
+    METHOD m_method;                     //请求方法
+    char m_real_file[FILENAME_LEN];      //目标文件路径
+    char *m_url;                         //文件名
+    char *m_version;                     //HTTP版本
+    char *m_host;                        //主机名
     int m_content_length;
     bool keep_alive;
     char *m_file_address;
