@@ -148,6 +148,9 @@ map<string, string> parse_form(string str)
 //用户登录验证函数
 bool login_user(string username, string passwd)
 {
+    // static map<string,string> login;
+    // if(login.find(username)!=login.end())
+        // return true;
     Connection conn;
     string select_sql = "select * from user where username='" + username + "' and passwd='" + passwd + "'";
     // printf("%s\n", select_sql.c_str());
@@ -155,16 +158,16 @@ bool login_user(string username, string passwd)
     {
         return false;
     }
-    MYSQL_RES *res;
-    res = mysql_store_result(conn.GetConn());
+    MYSQL_RES *res = mysql_store_result(conn.GetConn());
     if (mysql_num_rows(res))
     {
-        // free(res);
+        // login[username]=passwd;
+        mysql_free_result(res);
         return true;
     }
     else
     {
-        // free(res);
+        mysql_free_result(res);
         return false;
     }
 }
@@ -182,12 +185,15 @@ bool register_user(string username, string passwd)
     {
         return true;
     }
-    if (mysql_store_result(conn.GetConn()))
+    MYSQL_RES *res = mysql_store_result(conn.GetConn());
+    if (res)
     {
+        mysql_free_result(res);
         return true;
     }
     else
     {
+        mysql_free_result(res);
         return false;
     }
 }
