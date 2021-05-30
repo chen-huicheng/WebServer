@@ -74,19 +74,5 @@ public:
         errno = save_errno;
     }
 };
-<<<<<<< HEAD
-static void usage()
-{
-   fprintf(stderr,
-           "webserver [option] \n",
-           "  -p    监听端口号   (默认1234).\n",
-           "  -r    请求队列最大长度    (默认10000).\n",
-           "  -s    数据库连接数量  (默认为8).\n",
-           "  -t    线程数量    (默认为5).\n",
-           "  -l    是否使用优雅关闭连接  (1是 0否 默认:0 不使用).\n",
-           "  -c    关闭日志.\n");
-}
-=======
 void usage();
->>>>>>> 031018a4d790bd0a53edc48b85a5194f1559b5f3
 #endif //WEBSERVER_UTIL_H_
