@@ -36,6 +36,7 @@ int http10 = 1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
 #define METHOD_HEAD 1
 #define METHOD_OPTIONS 2
 #define METHOD_TRACE 3
+#define METHOD_POST 4
 #define PROGRAM_VERSION "1.5"
 int method = METHOD_GET;
 int clients = 1;
@@ -48,8 +49,10 @@ int benchtime = 30;
 int mypipe[2];
 char host[MAXHOSTNAMELEN];
 #define REQUEST_SIZE 2048
+#define MESSAGE_SIZE 1024
 char request[REQUEST_SIZE];
-
+char message[MESSAGE_SIZE];
+//TODO: 添加post测试
 static const struct option long_options[] =
     {
         {"force", no_argument, &force, 1},
@@ -59,10 +62,12 @@ static const struct option long_options[] =
         {"http09", no_argument, NULL, '9'},
         {"http10", no_argument, NULL, '1'},
         {"http11", no_argument, NULL, '2'},
+        {"message", no_argument, NULL, 'm'},
         {"get", no_argument, &method, METHOD_GET},
         {"head", no_argument, &method, METHOD_HEAD},
         {"options", no_argument, &method, METHOD_OPTIONS},
         {"trace", no_argument, &method, METHOD_TRACE},
+        {"post", no_argument, &method, METHOD_POST},
         {"version", no_argument, NULL, 'V'},
         {"proxy", required_argument, NULL, 'p'},
         {"clients", required_argument, NULL, 'c'},
@@ -90,10 +95,12 @@ static void usage(void)
            "  -9|--http09              Use HTTP/0.9 style requests.\n"
            "  -1|--http10              Use HTTP/1.0 protocol.\n"
            "  -2|--http11              Use HTTP/1.1 protocol.\n"
+           "  -m|--massage             POST method body massage."
            "  --get                    Use GET request method.\n"
            "  --head                   Use HEAD request method.\n"
            "  --options                Use OPTIONS request method.\n"
            "  --trace                  Use TRACE request method.\n"
+           "  --post                   Use POST request method.\n"
            "  -?|-h|--help             This information.\n"
            "  -V|--version             Display program version.\n");
 };
@@ -111,7 +118,7 @@ int main(int argc, char *argv[])
       return 2;
    }
 
-   while ((opt = getopt_long(argc, argv, "912Vfrt:p:c:?h", long_options, &options_index)) != EOF)
+   while ((opt = getopt_long(argc, argv, "912Vfrt:m:p:c:?h", long_options, &options_index)) != EOF)
    {
       switch (opt)
       {
@@ -167,6 +174,11 @@ int main(int argc, char *argv[])
          break;
       case 'c':
          clients = atoi(optarg);
+         break;
+      case 'm':
+         printf(optarg);
+         strcpy(message,optarg);
+         printf(message);
          break;
       }
    }
@@ -263,6 +275,9 @@ void build_request(const char *url)
    case METHOD_TRACE:
       strcpy(request, "TRACE");
       break;
+   case METHOD_POST:
+      strcpy(request, "POST");
+      break;
    }
 
    strcat(request, " ");
@@ -337,10 +352,22 @@ void build_request(const char *url)
    }
    if (http10 > 1)
       strcat(request, "Connection: close\r\n");
+   if(method == METHOD_POST&&strlen(message)){
+      strcat(request,"Content-Length: ");
+      char tmp[10];
+      sprintf(tmp,"%ld\r\n",strlen(message));
+      strcat(request,tmp);
+   }
+      
    /* add empty line at end */
    if (http10 > 0)
       strcat(request, "\r\n");
-   // printf("Req=%s\n",request);
+   if(method == METHOD_POST)
+      strcat(request,message);
+   // *request = '\0';
+   // "POST /pages/login HTTP/1.1\r\nHost: 127.0.0.1:1234\r\nContent-Length: 25\r\n\r\nusername=cheng&passwd=123"
+   // strcat(request,"POST /pages/login HTTP/1.1\r\nHost: 127.0.0.1:1234\r\nConnection: close\r\nContent-Length: 25\r\n\r\nusername=cheng&passwd=123\0");
+   printf("Req=%s\n",request);
 }
 
 /* vraci system rc error kod */
