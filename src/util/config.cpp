@@ -1,4 +1,5 @@
 #include "config.h"
+#include "util.h"
 Config::Config()
 {
     //端口号,默认1234

@@ -208,3 +208,15 @@ void addsig(int sig, void(handler)(int), bool restart)
     sigfillset(&sa.sa_mask);
     assert(sigaction(sig, &sa, NULL) != -1);
 }
+//显示参数说明
+void usage()
+{
+   fprintf(stderr,
+           "webserver [option] \n"
+           "  -p    监听端口号   (默认1234).\n"
+           "  -l    是否使用优雅关闭连接    (1是 0否 默认:0 不使用).\n"
+           "  -s    数据库连接数量  (默认为8).\n"
+           "  -t    线程数量    (默认为5).\n"
+           "  -c    是否关闭日志    (1是 0否 默认:0 开启日志).\n"
+           "  -r    请求队列最大长度    (默认10000).\n");
+}

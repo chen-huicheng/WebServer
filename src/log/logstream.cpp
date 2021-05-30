@@ -22,7 +22,7 @@ LogStream::~LogStream()
     delete write_buf_;
 };
 //初始化日志
-void LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
+bool LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
 {
     pre_filename_ = pre_filename;
     max_lines_ = max_lines;
@@ -30,10 +30,14 @@ void LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
     today_ = getTime();
     full_name_ = pre_filename_ + "_" + today_ + "_" + to_string(num_) + ".log";
     fp_ = fopen(full_name_.c_str(), "ae");
+    if(fp_<0){
+        printf("log file open failed!!");
+        return false;
+    }
 
     buf_size_ += 1024;
     buf_size_ &= ~1023;
-    printf("log buf size:%d\n", buf_size_);
+    printf("log buf size:%ld\n", buf_size_);
     buf_ = new char[buf_size_];      //新建一个日志缓冲池
     next_buf_ = new char[buf_size_]; //备用日志缓冲池
     write_buf_ = nullptr;
@@ -41,14 +45,15 @@ void LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
     pthread_t tid; //定义日志刷新线程　缓冲区满时刷新
     if (pthread_create(&tid, NULL, writeToFile, this) != 0)
     {
-        throw std::exception();
+        return false;
     }
     if (pthread_detach(tid))
     {
-        throw std::exception();
+        return false;
     }
+    return true;
 }
-int LogStream::write(char *line, int len)
+int LogStream::write(char *line, size_t len)
 {
     if (nullptr == line)
         return 0;
@@ -85,6 +90,7 @@ int LogStream::write(char *line, int len)
     buf_in_ += len;
     cur_lines_++;
     mutex.unlock();
+    return len;
 }
 int LogStream::flush()
 {
@@ -103,7 +109,7 @@ int LogStream::flush()
     buf_ = next_buf_;
     next_buf_ = nullptr;
     mutex.unlock();
-    flushWriteBuf();//再次刷新　write_buf_
+    return flushWriteBuf();//再次刷新　write_buf_
 }
 
 void LogStream::run()
@@ -137,20 +143,23 @@ void LogStream::run()
 }
 int LogStream::flushWriteBuf() //刷新　write_buf_
 {
+    int ret=0;
     fmutex.lock();
     if (nullptr != write_buf_)
     {
         fputs(write_buf_, fp_);
         next_buf_ = write_buf_;
         write_buf_ = nullptr;
-        fflush(fp_);
+        ret = fflush(fp_);
     }
     fmutex.unlock();
+    return ret;
 }
 void *LogStream::writeToFile(void *arg)     //线程执行函数　调用LogStream.run　执行真正内容
 {
     LogStream *logstream = (LogStream *)arg;
     logstream->run();
+    return logstream;
 }
 string LogStream::getTime()
 {
