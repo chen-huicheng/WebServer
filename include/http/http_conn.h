@@ -115,7 +115,9 @@ public:
     static int m_epollfd;
     static int m_user_count;
     static shared_ptr<TimeHeap> time_heap;
+    static map<string,string> session; //TODO: session保存登录状态
     weak_ptr<heap_timer> timer;
+    bool login_stat;
 
 private:
     int m_state; //读为0, 写为1

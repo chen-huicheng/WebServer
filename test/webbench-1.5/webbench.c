@@ -213,6 +213,9 @@ int main(int argc, char *argv[])
    case METHOD_TRACE:
       printf("TRACE");
       break;
+   case METHOD_POST:
+      printf("POST");
+      break;
    }
    printf(" %s", argv[optind]);
    switch (http10)
