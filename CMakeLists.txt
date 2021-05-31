@@ -27,7 +27,7 @@ include_directories(
 )
 
 link_directories(
-        /usr/lib/aarch64-linux-gnu/
+    /usr/lib/aarch64-linux-gnu/
 )
 
 aux_source_directory(${project_src}/connection_pool src)
