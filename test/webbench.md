@@ -4,16 +4,7 @@
 
 > **Webbench实现的核心原理是**：父进程fork若干个子进程，每个子进程在用户要求时间或默认的时间内对目标web循环发出实际访问请求，父子进程通过管道进行通信，子进程通过管道写端向父进程传递在若干次请求访问完毕后记录到的总信息，父进程通过管道读端读取子进程发来的相关信息，子进程在时间到后结束，父进程在所有子进程退出后统计并给用户显示最后的测试结果，然后退出。
 
-```mermaid
-graph TD
-0(main)-->A[解析参数]-->B["build_request:构建请求头"]-->C{"pid = fork()"}
-C-->|"pid=0"|D(子进程)-->G("定时信号alarm(t)")-->信号处理timer=1-->T
-D-->S[发送请求]-->接受响应-->E(统计数据)-->T{timer}-->|timer=0|D
-T-->|timer=1|W["write"]-->P(管道)
-C-->|"pid>0"|F(父进程)-->R[read]-->P
-R-->输出统计数据
-
-```
+![image-20210531211707679](../docs/imgs/webbench.png)
 
 
 
@@ -61,3 +52,16 @@ Connection: close
 Content-Length: 24
 
 username=root&passwd=123
+
+
+
+```mermaid
+graph TD
+0(main)-->A[解析参数]-->B["build_request:构建请求头"]-->C{"pid = fork()"}
+C-->|"pid=0"|D(子进程)-->G("定时信号alarm(t)")-->信号处理timer=1-->T
+D-->S[发送请求]-->接受响应-->E(统计数据)-->T{timer}-->|timer=0|D
+T-->|timer=1|W["write"]-->P(管道)
+C-->|"pid>0"|F(父进程)-->R[read]-->P
+R-->输出统计数据
+```
+
