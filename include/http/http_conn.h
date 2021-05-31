@@ -56,7 +56,8 @@ public:
         FORBIDDEN_REQUEST,
         FILE_REQUEST,
         INTERNAL_ERROR,
-        CLOSED_CONNECTION
+        CLOSED_CONNECTION,
+        TEST_REQUEST
     };
     enum LINE_STATUS //行解析状态
     {
@@ -106,6 +107,7 @@ private:
     bool add_content_length(int content_length);
     bool add_linger();
     bool add_blank_line();
+    bool add_test_reponse();
 
     void process();
     bool read();

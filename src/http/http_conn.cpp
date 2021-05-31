@@ -10,6 +10,7 @@ const char *error_404_title = "Not Found";
 const char *error_404_form = "The requested file was not found on this server.\n";
 const char *error_500_title = "Internal Error";
 const char *error_500_form = "There was an unusual problem serving the request file.\n";
+const char *test_reponse = "<html><body>test</body></html>";
 
 int http_conn::m_user_count = 0;
 int http_conn::m_epollfd = -1;
@@ -323,6 +324,10 @@ http_conn::HTTP_CODE http_conn::do_post_request()
 
 http_conn::HTTP_CODE http_conn::do_get_request()
 {
+    if(strcmp(m_url,"/test")==0)
+    {
+        return TEST_REQUEST;
+    }
     strcpy(m_real_file, doc_root.c_str());
     int len = doc_root.size();
     strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
@@ -396,9 +401,9 @@ bool http_conn::write()
         if (bytes_to_send <= 0)
         {
             unmap();
-            modfd(m_epollfd, m_sockfd, EPOLLIN);
             if (keep_alive)
             {
+                modfd(m_epollfd, m_sockfd, EPOLLIN);
                 init();
                 return true;
             }
@@ -420,6 +425,7 @@ bool http_conn::add_response(const char *format, ...)
     if (len >= (WRITE_BUFFER_SIZE - 1 - m_write_idx))
     {
         va_end(arg_list);
+        printf("hello\n");
         return false;
     }
     // LOG_INFO("response: %s", m_write_buf+m_write_idx);
@@ -467,6 +473,12 @@ bool http_conn::add_content(const char *content)
 {
     LOG_INFO("%s\n", content);
     return add_response(content);
+}
+bool http_conn::add_test_reponse()
+{
+    LOG_INFO("%s\n", test_reponse);
+    add_headers(strlen(test_reponse));
+    return add_content(test_reponse);
 }
 
 bool http_conn::process_write(HTTP_CODE ret)
@@ -518,6 +530,13 @@ bool http_conn::process_write(HTTP_CODE ret)
             if (!add_content(ok_string))
                 return false;
         }
+        break;
+    }
+    case TEST_REQUEST:
+    {
+        add_status_line(200, ok_200_title);
+        add_test_reponse();
+        break;
     }
     default:
         return false;
@@ -542,7 +561,7 @@ void http_conn::process()
     {
         close_conn();
     }
-    if (!write())
+    else if (!write())
     {
         close_conn();
     }
