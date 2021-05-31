@@ -42,6 +42,7 @@ void ConnectionPool::init(std::string host, std::string user, std::string passwd
     passwd_ = passwd;
     db_name_ = db_name;
     max_conn_ = std::max(max_conn, MIN_CONN_NUM);
+    max_conn_=std::min(max_conn_,MAX_CONN_NUM);
 
     for (int i = 0; i < max_conn_; i++)
     {

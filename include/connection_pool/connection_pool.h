@@ -10,7 +10,8 @@
 #include "locker.h"
 #include "noncopyable.h"
 #include "logger.h"
-const int MIN_CONN_NUM = 3; //数据库最少链接数
+const int MIN_CONN_NUM = 1; //数据库最少链接数
+const int MAX_CONN_NUM = 1024; //数据库最多链接数
 
 class ConnectionPool
 {

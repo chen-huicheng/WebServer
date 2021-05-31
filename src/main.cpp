@@ -9,21 +9,14 @@ int main(int argc, char *argv[])
     //命令行解析
     Config config;
     config.parse_arg(argc, argv);
+    config.parse_ini_file("config.ini");
 
-    //需要修改的数据库信息,登录名,密码,库名
-     //数据库连接池初始化
-    string user = "root";
-    string passwd = "matrix";
-    string db_name = "mydb";
-    ConnectionPool::GetInstance()->init("localhost", user, passwd, db_name, 3306, config.sql_num);
+    //数据库连接池初始化
+    ConnectionPool::GetInstance()->init(config.mysql_host, config.mysql_user, config.mysql_passwd, config.mysql_db_name, config.mysql_port, config.mysql_conn_num);
 
 
     //日志初始化
-    string log_pre_filename="Serverlog";
-    
-    const int log_buf_size=1024*4*16;
-    const int log_max_lines=1000000;
-    Logger::get_instance()->init(log_pre_filename, config.close_log, log_buf_size, log_max_lines);
+    Logger::get_instance()->init(config.log_pre_filename, config.close_log, config.log_buf_size, config.log_max_lines);
 
 
     //webserver初始化

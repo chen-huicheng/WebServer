@@ -166,7 +166,7 @@ void Config::trim(string &str){
 	{
 		return;
 	}
-	int i, start_pos, end_pos;
+	size_t i, start_pos, end_pos;
 	for (i = 0; i < str.size(); ++i)
 	{
 		if (!isspace(str[i]))

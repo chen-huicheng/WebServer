@@ -27,7 +27,7 @@ void WebServer::init(Config config)
 {
     port = config.port;
     thread_num = config.thread_num;
-    opt_linger = config.opt_linger;
+    opt_linger = config.linger;
     max_request = config.max_request;
     timeout = false;
     stop_server = false;

@@ -8,13 +8,15 @@
 #include "locker.h"
 #include <vector>
 using namespace std;
+const int MIN_THREAD_num = 1;
+const int MAX_THREAD_NUM = 1024;
 
 template <typename T>
 class threadpool
 {
 public:
     /*thread_number是线程池中线程的数量，max_requests是请求队列中最多允许的、等待处理的请求的数量*/
-    threadpool(int thread_number = 8, int max_request = 10000);
+    threadpool(int thread_number = 5, int max_request = 10000);
     ~threadpool();
     bool append(shared_ptr<T> request);
 
@@ -41,7 +43,7 @@ threadpool<T>::threadpool(int thread_number, int max_requests) : thread_number_(
         printf("threadpool init exception!!!\n");
         throw std::exception();
     }
-        
+    thread_number_ = min(thread_number_, MAX_THREAD_NUM);
     for (int i = 0; i < thread_number; ++i)
     {
         pthread_t tid;
@@ -65,10 +67,8 @@ threadpool<T>::~threadpool()
 template <typename T>
 bool threadpool<T>::append(shared_ptr<T> request)
 {
-    // queuelocker_.lock();
     if (workqueue_.size() >= max_requests_)
     {
-        // queuelocker_.unlock();
         return false;
     }
     queuelocker_.lock();
