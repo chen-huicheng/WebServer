@@ -28,6 +28,10 @@
 #include "logger.h"
 #include "timer.h"
 #include "util.h"
+struct file_{
+    struct stat file_stat;
+    char * address;
+};
 
 class http_conn
 {
@@ -35,6 +39,7 @@ public:
     static const int FILENAME_LEN = 200;
     static const int READ_BUFFER_SIZE = 2048;
     static const int WRITE_BUFFER_SIZE = 2048;
+    static const int CACHE_SIZE = 16;
     enum METHOD //http 头部方法
     {
         GET = 0,
@@ -150,5 +155,7 @@ private:
     size_t bytes_to_send;
     size_t bytes_have_send;
     string doc_root;
+    static map<string,file_> file_cache;
+    static locker file_mutex;
 };
 #endif //WEBSERVER_HTTP_CONN_H_

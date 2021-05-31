@@ -15,6 +15,9 @@ const char *test_reponse = "<html><body>test</body></html>";
 int http_conn::m_user_count = 0;
 int http_conn::m_epollfd = -1;
 shared_ptr<TimeHeap> http_conn::time_heap;
+
+map<string,file_> http_conn::file_cache;
+locker http_conn::file_mutex;
 //关闭连接，关闭一个连接，客户总量减一
 void http_conn::close_conn()
 {
@@ -329,6 +332,12 @@ http_conn::HTTP_CODE http_conn::do_get_request()
         return TEST_REQUEST;
     }
     strcpy(m_real_file, doc_root.c_str());
+    auto file = file_cache.find(m_real_file);
+    if(file!=file_cache.end()){
+        m_file_address=file->second.address;
+        m_file_stat = file->second.file_stat;
+        return FILE_REQUEST;
+    }
     int len = doc_root.size();
     strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
     if (stat(m_real_file, &m_file_stat) < 0)
@@ -343,12 +352,21 @@ http_conn::HTTP_CODE http_conn::do_get_request()
     int fd = open(m_real_file, O_RDONLY);
     m_file_address = (char *)mmap(0, m_file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
+    file_ files;
+    files.address=m_file_address;
+    files.file_stat=m_file_stat;
+    file_mutex.lock();
+    file_cache[m_real_file]=files;
+    file_mutex.unlock();
     return FILE_REQUEST;
 }
 
 void http_conn::unmap()
 {
-    if (m_file_address)
+    if(file_cache.size()<CACHE_SIZE){
+        return;
+    }
+    else if (m_file_address)
     {
         munmap(m_file_address, m_file_stat.st_size);
         m_file_address = 0;
