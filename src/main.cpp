@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     //日志初始化
     Logger::get_instance()->init(config.log_pre_filename, config.close_log, config.log_buf_size, config.log_max_lines);
-
+    Logger::get_instance()->set_level(config.log_level);
 
     //webserver初始化
     WebServer server;

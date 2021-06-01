@@ -41,6 +41,7 @@ public:
 
     //是否关闭日志
     int close_log;
+    int log_level;
     string log_pre_filename;
     size_t log_buf_size;
     size_t log_max_lines;

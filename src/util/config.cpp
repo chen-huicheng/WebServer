@@ -118,6 +118,9 @@ void Config::parse_ini_file(string filename){
             close_log=1;
         }
     }
+    if(kv.find("log_level")!=kv.end()){
+        log_level=stoi(kv["log_level"]);
+    }
     if(kv.find("log_pre_filename")!=kv.end()){
         log_pre_filename=kv["log_pre_filename"];
     }
