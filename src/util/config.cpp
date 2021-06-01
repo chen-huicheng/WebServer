@@ -10,17 +10,23 @@ Config::Config()
     //优雅关闭链接，默认不使用
     linger = 0;
 
-    //数据库连接池数量,默认8
-    mysql_conn_num = 8;
-
     //线程池内的线程数量,默认5
     thread_num = 5;
 
-    //关闭日志,默认不关闭
-    close_log = 0;
-
     //请求队列中最大请求数量
     max_request = 10000;
+
+    //数据库连接池数量,默认8
+    mysql_conn_num = 8;
+    mysql_port=3306;
+
+
+    //关闭日志,默认不关闭
+    close_log = 0;
+    log_level=1;
+    log_pre_filename="ServerLog";
+    log_buf_size=65536;
+    log_max_lines=1000000;
 }
 
 void Config::parse_arg(int argc, char *argv[])
