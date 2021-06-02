@@ -34,7 +34,6 @@ CREATE TABLE `user` (
   `username` varchar(255) NOT NULL,
   `passwd` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`username`),
-  UNIQUE KEY `username` (`username`),
   KEY `user_passwd` (`username`,`passwd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
