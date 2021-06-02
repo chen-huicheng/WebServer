@@ -23,7 +23,7 @@ Config::Config()
 
     //关闭日志,默认不关闭
     close_log = 0;
-    log_level=1;
+    log_level=INFO;
     log_pre_filename="ServerLog";
     log_buf_size=65536;
     log_max_lines=1000000;
@@ -125,7 +125,7 @@ void Config::parse_ini_file(string filename){
         }
     }
     if(kv.find("log_level")!=kv.end()){
-        log_level=stoi(kv["log_level"]);
+        log_level=LOGLEVEL(stoi(kv["log_level"]));
     }
     if(kv.find("log_pre_filename")!=kv.end()){
         log_pre_filename=kv["log_pre_filename"];

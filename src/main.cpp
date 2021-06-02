@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
 {
     //命令行解析
     Config config;
-    config.parse_arg(argc, argv);
     config.parse_ini_file("config.ini");
+    config.parse_arg(argc, argv);
 
     //数据库连接池初始化
     ConnectionPool::GetInstance()->init(config.mysql_host, config.mysql_user, config.mysql_passwd, config.mysql_db_name, config.mysql_port, config.mysql_conn_num);
