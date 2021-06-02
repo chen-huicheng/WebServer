@@ -41,20 +41,22 @@ void WebServer::init(Config config)
 void WebServer::initIO()
 {
     listenfd = open_listenfd(port);
-    if(setnonblocking(listenfd)==-1){
+    if (setnonblocking(listenfd) == -1)
+    {
         printf("set socket non block failed:");
         abort();
     }
 
     epollfd = epoll_create(5);
-    if(-1 == epollfd){
+    if (-1 == epollfd)
+    {
         printf("create epollfd failed:");
         abort();
     }
 
     http_conn::m_epollfd = epollfd;
 
-    // addfd(epollfd, listenfd, false);//ET mode
+    // addfd(epollfd, listenfd, false); //ET mode
     //设置 listenfd LT触发
     epoll_event event;
     event.data.fd = listenfd;
@@ -72,7 +74,7 @@ void WebServer::initIO()
     alarm(TIMESLOT);
 
     time_heap = make_shared<TimeHeap>(MAX_FD);
-    http_conn::time_heap=time_heap;
+    http_conn::time_heap = time_heap;
 }
 
 void WebServer::initHttpConn(int connfd, struct sockaddr_in client_address)
@@ -99,9 +101,10 @@ void WebServer::adjustTimer(shared_ptr<heap_timer> timer)
     time_heap->adjustTimer(timer, 3 * TIMESLOT);
 }
 
-bool WebServer::acceptClient()//TODO:将listenfd修改为ET模式
+bool WebServer::acceptClient()
 {
     struct sockaddr_in client_address;
+    // while(1){
     socklen_t client_addrlength = sizeof(client_address);
     int connfd = accept(listenfd, (struct sockaddr *)&client_address, &client_addrlength);
     if (connfd < 0)
@@ -120,6 +123,8 @@ bool WebServer::acceptClient()//TODO:将listenfd修改为ET模式
     char buf[20];
     LOG_DEBUG("accept client from %s:%d\n", inet_ntop(AF_INET, &client_address.sin_addr, buf, INET_ADDRSTRLEN), ntohs(client_address.sin_port));
     initHttpConn(connfd, client_address);
+    // }
+
     return true;
 }
 
@@ -224,6 +229,7 @@ void WebServer::loop()
             if (sockfd == listenfd)
             {
                 acceptClient();
+                // reset_oneshot(epollfd, listenfd);
                 // while(acceptClient());
             }
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))

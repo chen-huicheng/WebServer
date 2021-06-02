@@ -49,29 +49,28 @@ private:
     ~Logger(){};
     //日志级别转换为string
     string levelstr(LOGLEVEL level);
-    
 
 private:
-    bool close_log_;        //是否关闭日志
-    LOGLEVEL cur_level_;    //默认 INFO
-    LogStream logstream_;   //缓冲区 延迟写入到文件
-    const int log_buf_size_=1024; //日志buf大小
+    bool close_log_;                //是否关闭日志
+    LOGLEVEL cur_level_;            //默认 INFO
+    LogStream logstream_;           //缓冲区 延迟写入到文件
+    const int log_buf_size_ = 1024; //日志buf大小
 };
 
-#define LOG_DEBUG(msg, args...)                             \
-    {                                                       \
+#define LOG_DEBUG(msg, args...)                                \
+    {                                                          \
         Logger::get_instance()->write_log(DEBUG, msg, ##args); \
     }
-#define LOG_INFO(msg, args...)                             \
-    {                                                      \
+#define LOG_INFO(msg, args...)                                \
+    {                                                         \
         Logger::get_instance()->write_log(INFO, msg, ##args); \
     }
-#define LOG_WARN(msg, args...)                             \
-    {                                                      \
+#define LOG_WARN(msg, args...)                                \
+    {                                                         \
         Logger::get_instance()->write_log(WARN, msg, ##args); \
     }
-#define LOG_ERROR(msg, args...)                             \
-    {                                                       \
+#define LOG_ERROR(msg, args...)                                \
+    {                                                          \
         Logger::get_instance()->write_log(ERROR, msg, ##args); \
     }
 #define LOG_FLUSH() Logger::get_instance()->flush()
