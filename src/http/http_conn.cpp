@@ -332,14 +332,14 @@ http_conn::HTTP_CODE http_conn::do_get_request()
         return TEST_REQUEST;
     }
     strcpy(m_real_file, doc_root.c_str());
+    int len = doc_root.size();
+    strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
     if(file_cache.count(m_real_file)){
         file_stat = file_cache[m_real_file];
         return FILE_REQUEST;
     }
     char *address;
     struct stat m_file_stat;
-    int len = doc_root.size();
-    strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
     if (stat(m_real_file, &m_file_stat) < 0)
         return NO_RESOURCE;
 
@@ -364,7 +364,7 @@ void http_conn::unmap()
     if(file_cache.size()<CACHE_SIZE){
         return;
     }
-    else if (file_stat->address)
+    else if (file_stat)
     {
         string file_name;
         uint32_t min_n=UINT32_MAX;
@@ -417,18 +417,6 @@ bool http_conn::write()
         }
         bytes_have_send += temp;
         bytes_to_send -= temp;
-        if (bytes_have_send >= m_iv[0].iov_len)
-        {
-            m_iv[0].iov_len = 0;
-            m_iv[1].iov_base = file_stat->address + (bytes_have_send - m_write_idx);
-            m_iv[1].iov_len = bytes_to_send;
-        }
-        else
-        {
-            m_iv[0].iov_base = m_write_buf + bytes_have_send;
-            m_iv[0].iov_len = m_iv[0].iov_len - bytes_have_send;
-        }
-
         if (bytes_to_send <= 0)
         {
             unmap();
@@ -443,6 +431,18 @@ bool http_conn::write()
                 return false;
             }
         }
+        if (m_iv_count>1&&bytes_have_send >= m_iv[0].iov_len)
+        {
+            m_iv[0].iov_len = 0;
+            m_iv[1].iov_base = file_stat->address + (bytes_have_send - m_write_idx);
+            m_iv[1].iov_len = bytes_to_send;
+        }
+        else
+        {
+            m_iv[0].iov_base = m_write_buf + bytes_have_send;
+            m_iv[0].iov_len = m_iv[0].iov_len - bytes_have_send;
+        }
+
     }
 }
 
@@ -591,11 +591,11 @@ void http_conn::process()
     {
         close_conn();
     }
-    else if (!write())
-    {
-        close_conn();
-    }
-    // modfd(m_epollfd, m_sockfd, EPOLLOUT);
+    // else if (!write())
+    // {
+    //     close_conn();
+    // }
+    modfd(m_epollfd, m_sockfd, EPOLLOUT);
 }
 
 void http_conn::run()
