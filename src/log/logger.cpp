@@ -23,7 +23,7 @@ bool Logger::init(string file_name, bool close_log, size_t log_buf_size, size_t 
     cur_level_ = level;
     if(!logstream_.init(file_name, log_buf_size, log_max_lines))
     {
-        printf("logger init failed!!");
+        LOG_ERROR("logger init failed!!");
         return false;
     }
     return true;

@@ -40,7 +40,7 @@ threadpool<T>::threadpool(int thread_number, int max_requests) : thread_number_(
 {
     if (thread_number <= 0 || max_requests <= 0)
     {
-        printf("threadpool init exception!!!\n");
+        LOG_ERROR("threadpool init exception!!!\n");
         throw std::exception();
     }
     thread_number_ = min(thread_number_, MAX_THREAD_NUM);

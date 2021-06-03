@@ -1,5 +1,5 @@
 #include "logstream.h"
-
+#include "logger.h"
 //初始化日志　参数
 LogStream::LogStream()
 {
@@ -31,13 +31,13 @@ bool LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
     full_name_ = pre_filename_ + "_" + today_ + "_" + to_string(num_) + ".log";
     fp_ = fopen(full_name_.c_str(), "ae");
     if(fp_<0){
-        printf("log file open failed!!");
+        LOG_ERROR("log file open failed!!");
         return false;
     }
 
     buf_size_ += 1023;
     buf_size_ &= ~1023;
-    printf("log buf size:%ld\n", buf_size_);
+    LOG_INFO("log buf size:%ld\n", buf_size_);
     buf_ = new char[buf_size_];      //新建一个日志缓冲池
     next_buf_ = new char[buf_size_]; //备用日志缓冲池
     write_buf_ = nullptr;

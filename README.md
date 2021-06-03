@@ -38,7 +38,7 @@ source mydb.sql
 + 修改config.ini中的修改配置信息
 
 ```ini
-    [common]
+[common]
 #服务器使用端口 默认1234
 port=1234
 #线程数量  默认5
@@ -65,13 +65,14 @@ mysql_conn_num=8
 [logger]
 #是否启用日志 默认启用
 enable=1
+#日志级别 0 DEBUG,1 INFO, 2 WARN, 3 ERROR 只输出大于等于该级别的日志信息
+log_level=1
 #日志文件名前缀
 log_pre_filename=Serverlog
 #日志缓冲区大小 会向上调整到1024的倍数
 log_buf_size=65536
 #单个日志文件的最大行数限制 粗略值
 log_max_lines=1000000
-
 ```
 
 + build   &   运行webserver

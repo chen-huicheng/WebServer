@@ -443,7 +443,6 @@ bool http_conn::add_response(const char *format, ...)
     if (len >= (WRITE_BUFFER_SIZE - 1 - m_write_idx))
     {
         va_end(arg_list);
-        printf("hello\n");
         return false;
     }
     // LOG_INFO("response: %s", m_write_buf+m_write_idx);

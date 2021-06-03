@@ -31,7 +31,6 @@ void ConnectionPool::init(std::string host, std::string user, std::string passwd
     if (is_init_)
     {
         LOG_WARN("Connection pool has been initialized\n");
-        fprintf(stderr, "Connection pool has been initialized\n");
         return;
     }
 
@@ -51,13 +50,14 @@ void ConnectionPool::init(std::string host, std::string user, std::string passwd
         if (NULL == conn)
         {
             // log
-            printf("mysqlpool init exception!!!\n");
-            throw std::exception();
+            LOG_ERROR("mysqlpool init failed!!!\n");
+            abort();
         }
         conn = mysql_real_connect(conn, host.c_str(), user.c_str(), passwd.c_str(), db_name.c_str(), port, NULL, 0);
         if (NULL == conn)
         {
-            throw std::exception();
+            LOG_ERROR("mysqlpool init failed!!!\n");
+            abort();
         }
         pool_.push_back(conn);
         reserve_.post();

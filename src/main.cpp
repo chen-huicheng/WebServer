@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     //webserver初始化
     WebServer server;
     server.init(config);
-    printf("using port:%d\n", config.port);
+    LOG_INFO("using port:%d\n", config.port);
     //运行
     server.loop();
 
