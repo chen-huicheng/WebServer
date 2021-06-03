@@ -14,6 +14,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <signal.h>
+#include "logger.h"
 
 class http_conn;
 
@@ -53,7 +54,7 @@ public:
         epollfd = epollfd_;
         int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, pipefd);
         if(ret==-1){
-            printf("create socketpait faild");
+            LOG_ERROR("create socketpait faild");
             abort();
         }
         setnonblocking(pipefd[0]);

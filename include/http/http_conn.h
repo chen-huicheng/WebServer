@@ -21,16 +21,18 @@
 #include <cerrno>
 #include <sys/wait.h>
 #include <sys/uio.h>
-#include <map>
+#include <unordered_map>
 
 #include "locker.h"
 #include "connection_pool.h"
 #include "logger.h"
 #include "timer.h"
 #include "util.h"
-struct file_{
-    struct stat file_stat;
+struct FileStat{
+    FileStat(struct stat _status,char *_addraass):status(_status),address(_addraass),usage_times(1){}
+    struct stat status;
     char * address;
+    uint32_t usage_times;
 };
 
 class http_conn
@@ -146,8 +148,9 @@ private:
     char *m_host;                        //主机名
     int m_content_length;
     bool keep_alive;
-    char *m_file_address;
-    struct stat m_file_stat;
+    shared_ptr<FileStat> file_stat;
+    // char *m_file_address;
+    // struct stat m_file_stat;
     struct iovec m_iv[2];
     int m_iv_count;
 
@@ -155,7 +158,7 @@ private:
     size_t bytes_to_send;
     size_t bytes_have_send;
     string doc_root;
-    static map<string,file_> file_cache;
+    static unordered_map<string,shared_ptr<FileStat> > file_cache;
     static locker file_mutex;
 };
 #endif //WEBSERVER_HTTP_CONN_H_

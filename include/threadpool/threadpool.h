@@ -5,8 +5,11 @@
 #include <list>
 #include <exception>
 #include <cstdio>
-#include "locker.h"
 #include <vector>
+
+#include "logger.h"
+#include "locker.h"
+
 using namespace std;
 const int MIN_THREAD_num = 1;
 const int MAX_THREAD_NUM = 1024;

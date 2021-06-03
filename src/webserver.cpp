@@ -43,14 +43,14 @@ void WebServer::initIO()
     listenfd = open_listenfd(port);
     if (setnonblocking(listenfd) == -1)
     {
-        printf("set socket non block failed:");
+        LOG_ERROR("set socket non block failed:");
         abort();
     }
 
     epollfd = epoll_create(5);
     if (-1 == epollfd)
     {
-        printf("create epollfd failed:");
+        LOG_ERROR("create epollfd failed:");
         abort();
     }
 

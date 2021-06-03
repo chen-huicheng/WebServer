@@ -28,7 +28,7 @@ public:
         return &instance;
     }
     //初始化日志　filename:日志文件名　close_log:是否关闭日志　log_buf_size:日志缓冲区大小　log_max_lines:日志文件存储最对行数　level:日志级别
-    bool init(string filename, bool close_log, size_t log_buf_size = 4096*8, size_t log_max_lines = 5000000, LOGLEVEL level = INFO);
+    bool init(string filename, bool close_log, size_t log_buf_size = 4096 * 8, size_t log_max_lines = 5000000, LOGLEVEL level = INFO);
     //写日志借口
     void write_log(LOGLEVEL level, const char *msg, ...);
     //刷新日志到磁盘
@@ -72,6 +72,7 @@ private:
 #define LOG_ERROR(msg, args...)                                \
     {                                                          \
         Logger::get_instance()->write_log(ERROR, msg, ##args); \
+        Logger::get_instance()->flush();                       \
     }
-#define LOG_FLUSH() Logger::get_instance()->flush()
+#define LOG_FLUSH() Logger::get_instance()->flush();
 #endif //WEBSERVER_LOG_H_
