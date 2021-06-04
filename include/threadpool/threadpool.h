@@ -36,7 +36,6 @@ private:
     locker queuelocker_;                 //保护请求队列的互斥锁
     sem queuestat_;                      //是否有任务需要处理
     bool stop_;                          //是否结束线程
-    bool is_init_;
 };
 template <typename T>
 threadpool<T>::threadpool(int thread_number, int max_requests) : thread_number_(thread_number), max_requests_(max_requests), stop_(false)
