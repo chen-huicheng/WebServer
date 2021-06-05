@@ -27,6 +27,7 @@ void http_conn::close_conn()
     //从epoll监听中删除 并关闭连接
     epoll_ctl(m_epollfd, EPOLL_CTL_DEL, m_sockfd, 0);
     close(m_sockfd);
+    file_stat.reset();
     m_user_count--;
 }
 
@@ -302,11 +303,11 @@ http_conn::HTTP_CODE http_conn::do_post_request()
 
         if (login_user(username, passwd))
         {
-            m_url = "/pages/welcome.html";
+            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/welcome.html");
         }
         else
         {
-            m_url = "/pages/loginError.html";
+            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/registerError.html");
         }
     }
     else if (strlen(p) == 8 && strncmp(p, "register", 8) == 0)
@@ -315,11 +316,11 @@ http_conn::HTTP_CODE http_conn::do_post_request()
         string passwd = kv_pair["passwd"];
         if (register_user(username, passwd))
         {
-            m_url = "/pages/welcome.html";
+            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/welcome.html");
         }
         else
         {
-            m_url = "/pages/registerError.html";
+            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/registerError.html");
         }
     }
     return do_get_request();
@@ -334,10 +335,13 @@ http_conn::HTTP_CODE http_conn::do_get_request()
     strcpy(m_real_file, doc_root.c_str());
     int len = doc_root.size();
     strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
+    file_mutex.lock();
     if(file_cache.count(m_real_file)){
         file_stat = file_cache[m_real_file];
+        file_mutex.unlock();
         return FILE_REQUEST;
     }
+    file_mutex.unlock();
     char *address;
     struct stat m_file_stat;
     if (stat(m_real_file, &m_file_stat) < 0)
@@ -380,7 +384,6 @@ void http_conn::unmap()
                 file_name=it.first;
             }
         }
-        munmap(file_cache[file_name]->address, file_cache[file_name]->status.st_size);
         file_cache.erase(file_name);
         file_mutex.unlock();
     }
@@ -591,11 +594,11 @@ void http_conn::process()
     {
         close_conn();
     }
-    // else if (!write())
-    // {
-    //     close_conn();
-    // }
-    modfd(m_epollfd, m_sockfd, EPOLLOUT);
+    else if (!write())
+    {
+        close_conn();
+    }
+    // modfd(m_epollfd, m_sockfd, EPOLLOUT);
 }
 
 void http_conn::run()

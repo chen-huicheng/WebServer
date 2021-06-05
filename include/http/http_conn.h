@@ -30,6 +30,9 @@
 #include "util.h"
 struct FileStat{
     FileStat(struct stat _status,char *_addraass):status(_status),address(_addraass),usage_times(1){}
+    ~FileStat(){
+       munmap(address, status.st_size);
+    }
     struct stat status;
     char * address;
     uint32_t usage_times;
