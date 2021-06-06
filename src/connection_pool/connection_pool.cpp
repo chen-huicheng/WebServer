@@ -93,6 +93,7 @@ bool ConnectionPool::ReleaseConnection(MYSQL *conn)
     pool_.push_back(conn);
     lock_.unlock();
     reserve_.post();
+    conn = NULL;
     return true;
 }
 
