@@ -20,6 +20,7 @@ string Logger::levelstr(LOGLEVEL level)
 bool Logger::init(string file_name, bool close_log, size_t log_buf_size, size_t log_max_lines, LOGLEVEL level)
 {
     close_log_ = close_log;
+    if(close_log_)return true;
     cur_level_ = level;
     if(!logstream_.init(file_name, log_buf_size, log_max_lines))
     {
@@ -31,10 +32,10 @@ bool Logger::init(string file_name, bool close_log, size_t log_buf_size, size_t 
 
 void Logger::write_log(LOGLEVEL level, const char *msg, ...)
 {
-    char buf[1024] = {0}; //日志buf
-    int buf_cur_idx = 0;
     if (level < cur_level_ || close_log_)
         return;
+    char buf[1024] = {0}; //日志buf
+    int buf_cur_idx = 0;
     time_t t = time(NULL);
     struct tm *sys_tm = localtime(&t);
     struct tm my_tm = *sys_tm;
@@ -69,5 +70,6 @@ void Logger::write_log(LOGLEVEL level, const char *msg, ...)
 void Logger::flush(void)
 {
     //调用logstream的flush刷新缓冲区
+    if(close_log_)return;
     logstream_.flush();
 }

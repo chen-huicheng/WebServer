@@ -37,7 +37,6 @@ bool LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
 
     buf_size_ += 1023;
     buf_size_ &= ~1023;
-    LOG_INFO("log buf size:%ld\n", buf_size_);
     buf_ = new char[buf_size_];      //新建一个日志缓冲池
     next_buf_ = new char[buf_size_]; //备用日志缓冲池
     write_buf_ = nullptr;
@@ -95,13 +94,8 @@ int LogStream::write(char *line, size_t len)
 int LogStream::flush()
 {
     //刷新　write_buf_
-    flushWriteBuf();
     mutex.lock();
-    if(write_buf_!=nullptr){//执行完　flushWriteBuf　可能又被重新赋值　必须保证write_buf_为空　否则会导致内存泄露
-        mutex.unlock();
-        flushWriteBuf();
-        mutex.lock();
-    }
+    flushWriteBuf();
     //将当前缓冲区内容交给　write_buf_
     buf_[buf_in_] = '\0';
     buf_in_ = 0;

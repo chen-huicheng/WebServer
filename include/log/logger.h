@@ -75,4 +75,9 @@ private:
         Logger::get_instance()->flush();                       \
     }
 #define LOG_FLUSH() Logger::get_instance()->flush();
+// #define LOG_DEBUG(msg, args...)  {}
+// #define LOG_INFO(msg, args...)   {}
+// #define LOG_WARN(msg, args...)   {}
+// #define LOG_ERROR(msg, args...)   {}
+// #define LOG_FLUSH() {};
 #endif //WEBSERVER_LOG_H_
