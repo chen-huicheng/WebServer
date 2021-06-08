@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <cassert>
+#include "locker.h"
 using namespace std;
 class http_conn;
 
@@ -66,6 +67,8 @@ public:
 private:
     void percolate_down(int hole);//下虑操作
     void percolate_up(int hole);//上虑操作
+    vector<int> overtimer;
+    locker mutex;
     void adjust(); //调整堆  将已删除的节点进行上虑
     vector<shared_ptr<heap_timer>> array;
     int capacity;

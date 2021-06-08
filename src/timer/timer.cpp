@@ -6,7 +6,6 @@ bool TimeHeap::add_timer(shared_ptr<heap_timer> timer) //添加一个定时器
         return false;
     if (cur_size >= capacity) //定时堆当前容量大于最大容量   将调整一次堆
     {
-        adjust();
         tick();
         assert(cur_size < capacity);
     }
@@ -20,6 +19,9 @@ bool TimeHeap::del_timer(shared_ptr<heap_timer> timer) //延迟销毁
 {
     if (!timer)
         return false;
+    mutex.lock();
+    overtimer.push_back(timer->hole_);
+    mutex.unlock();
     timer->cb_func = nullptr;
     timer->user_data.reset();
     return true;
@@ -40,6 +42,7 @@ void TimeHeap::pop_timer() //删除堆顶元素 智能指针直接覆盖就行 �
 void TimeHeap::tick() //删除超时定时器  心搏函数
 {
     time_t cur = time(NULL);
+    adjust();
     while (!empty())
     {
         if (!array[0])
@@ -117,7 +120,11 @@ void TimeHeap::percolate_up(int hole)
 }
 void TimeHeap::adjust()
 {
-    for (int i = 0; i < cur_size; i++)
+    mutex.lock();
+    vector<int>tmp(overtimer);
+    overtimer.clear();
+    mutex.unlock();
+    for (auto i:tmp)
     {
         if (NULL == array[i]->cb_func)
         {
