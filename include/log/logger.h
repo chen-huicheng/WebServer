@@ -9,15 +9,15 @@
 #include "logstream.h"
 
 using namespace std;
-
+//日志级别
 enum LOGLEVEL
-{ //日志级别
+{ 
     DEBUG = 0,
     INFO,
     WARN,
     ERROR
 };
-
+// 调用logstream来实现日志异步写入 对于ERROR级别的日志每次写入都将其刷新到文件
 class Logger
 {
 public:

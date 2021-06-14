@@ -20,11 +20,13 @@ string Logger::levelstr(LOGLEVEL level)
 bool Logger::init(string file_name, bool close_log, size_t log_buf_size, size_t log_max_lines, LOGLEVEL level)
 {
     close_log_ = close_log;
-    if(close_log_)return true;
+    if (close_log_)
+        return true;
     cur_level_ = level;
-    if(!logstream_.init(file_name, log_buf_size, log_max_lines))
+    if (!logstream_.init(file_name, log_buf_size, log_max_lines))
     {
-        LOG_ERROR("logger init failed!!");
+        LOG_ERROR("logger init failed!!\n");
+        close_log = true;
         return false;
     }
     return true;
@@ -70,6 +72,7 @@ void Logger::write_log(LOGLEVEL level, const char *msg, ...)
 void Logger::flush(void)
 {
     //调用logstream的flush刷新缓冲区
-    if(close_log_)return;
+    if (close_log_)
+        return;
     logstream_.flush();
 }

@@ -54,7 +54,7 @@ public:
         epollfd = epollfd_;
         int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, pipefd);
         if(ret==-1){
-            LOG_ERROR("create socketpait faild");
+            LOG_ERROR("create socketpait faild\n");
             abort();
         }
         setnonblocking(pipefd[0]);

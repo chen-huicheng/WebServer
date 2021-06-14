@@ -10,9 +10,13 @@
 #include "locker.h"
 using namespace std;
 
+const size_t MIN_BUF_SIZE = 4096;
+const size_t MAX_BUF_SIZE = 4096 * 512;
 /*  异步日志　logger 调用　LogStream　将日志写入到缓冲区
     核心思想：使用两个缓冲区，当一个缓冲区写满是，写另外一个缓冲，
             同时写入线程将写满的缓冲写入磁盘，不阻塞当前线程
+            创建一个子进程用于当父进程错误退出是刷新缓冲区
+            保证所有的日志持久化
 */
 class LogStream : Noncopyable
 {
@@ -43,8 +47,8 @@ private:
     char *buf_;           //写入日志缓冲区　接受日志写入
     char *next_buf_;      //输出日志缓冲区　输出到文件
     char *write_buf_;     //备用日志缓冲区　
-    size_t buf_in_;       //当前日志待写入位置
-    size_t buf_out_;      //可输出位置
+    size_t *buf_in_;      //当前日志待写入位置
+    int *flag;            //当前buf使用的那个缓冲区
     size_t max_lines_;    //日志最大行数
     size_t buf_size_;     //日志缓冲区大小
     size_t cur_lines_;    //日志行数记录

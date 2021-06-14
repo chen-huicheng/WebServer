@@ -43,14 +43,14 @@ void WebServer::initIO()
     listenfd = open_listenfd(port);
     if (setnonblocking(listenfd) == -1)
     {
-        LOG_ERROR("set socket non block failed:");
+        LOG_ERROR("set socket non block failed\n");
         abort();
     }
 
     epollfd = epoll_create(5);
     if (-1 == epollfd)
     {
-        LOG_ERROR("create epollfd failed:");
+        LOG_ERROR("create epollfd failed\n");
         abort();
     }
 
@@ -258,7 +258,8 @@ void WebServer::loop()
         {
             int size = time_heap->size();
             time_heap->tick();
-            LOG_INFO("timer tick time_heap.size = %d(before):%d\n", size, time_heap->size());
+            if(size!=time_heap->size())
+                LOG_INFO("timer tick time_heap.size = %d(before):%d\n", size, time_heap->size());
             // printf("keep-alive nums:%d\n",time_heap->size());
             // printf("\033[1A\n");
             LOG_FLUSH();

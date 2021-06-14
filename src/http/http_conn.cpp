@@ -307,7 +307,7 @@ http_conn::HTTP_CODE http_conn::do_post_request()
         }
         else
         {
-            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/registerError.html");
+            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/loginError.html");
         }
     }
     else if (strlen(p) == 8 && strncmp(p, "register", 8) == 0)
