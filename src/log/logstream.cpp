@@ -49,8 +49,9 @@ bool LogStream::init(string pre_filename, size_t buf_size, size_t max_lines)
     //备用日志缓冲池
     next_buf_ = (char *)mmap(NULL, buf_size_, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     next_buf_[0] = '\0';
-    buf_in_ = (size_t *)mmap(NULL, sizeof(size_t), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    flag = (int *)mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    char *mem = (char *)mmap(NULL, sizeof(size_t)+sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    buf_in_ = (size_t*)mem;
+    flag = (int *)(mem+sizeof(size_t));
     write_buf_ = nullptr;
     (*buf_in_)=0;
     (*flag) = 0;
