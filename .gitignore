@@ -1,2 +1,10 @@
 /build
 *.log
+test/test_connectionpool.cpp
+.gitignore
+
+webserver
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json

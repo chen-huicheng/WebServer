@@ -28,6 +28,7 @@
 #include "logger.h"
 #include "timer.h"
 #include "util.h"
+#include "session.h"
 struct FileStat{
     FileStat(struct stat _status,char *_addraass):status(_status),address(_addraass),usage_times(1){}
     ~FileStat(){
@@ -115,6 +116,7 @@ private:
     bool add_headers(int content_length);
     bool add_content_type();
     bool add_content_length(int content_length);
+    bool add_cookie();
     bool add_linger();
     bool add_blank_line();
     bool add_test_reponse();
@@ -127,9 +129,10 @@ public:
     static int m_epollfd;
     static int m_user_count;
     static shared_ptr<TimeHeap> time_heap;
-    static map<string,string> session; //TODO: session保存登录状态
+    static Session session; //session保存登录状态
     weak_ptr<heap_timer> timer;
-    bool login_stat;
+    LOGIN_STATUS login_stat;
+    string sessionid;
 
 private:
     int m_state; //读为0, 写为1

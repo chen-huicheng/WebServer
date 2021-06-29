@@ -42,5 +42,6 @@ add_executable(${project_name} ${src})
 target_link_libraries(
     ${project_name}
     -lpthread
-    libmysqlclient.so
+    -lcrypto
+    -lmysqlclient
 )

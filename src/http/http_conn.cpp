@@ -11,13 +11,15 @@ const char *error_404_form = "The requested file was not found on this server.\n
 const char *error_500_title = "Internal Error";
 const char *error_500_form = "There was an unusual problem serving the request file.\n";
 const char *test_reponse = "<html><body>test</body></html>";
-
+const int TIMEOUT = 30; //单位分钟
+const int MAXCACHE = 10000;//最大缓存数
 int http_conn::m_user_count = 0;
 int http_conn::m_epollfd = -1;
 shared_ptr<TimeHeap> http_conn::time_heap;
 
 unordered_map<string,shared_ptr<FileStat> > http_conn::file_cache;
 locker http_conn::file_mutex;
+Session http_conn::session(MAXCACHE,TIMEOUT);
 //关闭连接，关闭一个连接，客户总量减一
 void http_conn::close_conn()
 {
@@ -67,6 +69,8 @@ void http_conn::init()
     memset(m_read_buf, '\0', READ_BUFFER_SIZE);
     memset(m_write_buf, '\0', WRITE_BUFFER_SIZE);
     memset(m_real_file, '\0', FILENAME_LEN);
+    sessionid.clear();
+    login_stat = UNLOGIN;
 }
 
 //循环读取客户数据，直到无数据可读或对方关闭连接
@@ -217,6 +221,15 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
         text += strspn(text, " \t");
         m_host = text;
     }
+    else if(strncasecmp(text,"Cookie:",7)==0)
+    {
+        text+=7;
+        text += strspn(text, " \t");
+        char *p = strpbrk(text, ";");
+        *p='\0';
+        sessionid = string(text);
+        login_stat = session.get_status(sessionid);
+    }
     else
     {
         LOG_DEBUG("oop!unknow header: %s\n", text);
@@ -303,7 +316,9 @@ http_conn::HTTP_CODE http_conn::do_post_request()
 
         if (login_user(username, passwd))
         {
-            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/welcome.html");
+            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/user/welcome.html");
+            sessionid = session.put(username);
+            login_stat = FIRST_LOGIN;
         }
         else
         {
@@ -316,7 +331,9 @@ http_conn::HTTP_CODE http_conn::do_post_request()
         string passwd = kv_pair["passwd"];
         if (register_user(username, passwd))
         {
-            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/welcome.html");
+            m_url = strcat(m_real_file+doc_root.size()+10,"/pages/user/welcome.html");
+            sessionid = session.put(username);
+            login_stat = FIRST_LOGIN;
         }
         else
         {
@@ -332,9 +349,18 @@ http_conn::HTTP_CODE http_conn::do_get_request()
     {
         return TEST_REQUEST;
     }
+    if(strstr(m_url,"/pages/user/")!=NULL){
+        if(sessionid.empty()||session.get_status(sessionid)==UNLOGIN)
+        {
+            LOG_ERROR("%s\n",sessionid.c_str());
+            return FORBIDDEN_REQUEST;
+        }
+            // 
+    }
     strcpy(m_real_file, doc_root.c_str());
     int len = doc_root.size();
     strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
+    
     file_mutex.lock();
     if(file_cache.count(m_real_file)){
         file_stat = file_cache[m_real_file];
@@ -490,7 +516,13 @@ bool http_conn::add_content_type()
     LOG_INFO("Content-Type:%s\r\n", "text/html");
     return add_response("Content-Type:%s\r\n", "text/html");
 }
-
+bool http_conn::add_cookie()
+{
+    LOG_INFO("set-cookie:%s\r\n", "text/html");
+    if(!sessionid.empty()&&login_stat==FIRST_LOGIN)
+        return add_response("set-cookie:%s\r\n", sessionid.c_str());
+    return true;
+}
 bool http_conn::add_linger()
 {
     LOG_INFO("Connection:%s\r\n", (keep_alive == true) ? "keep-alive" : "close");
@@ -545,6 +577,7 @@ bool http_conn::process_write(HTTP_CODE ret)
     case FILE_REQUEST:
     {
         add_status_line(200, ok_200_title);
+        add_cookie();
         if (file_stat->status.st_size != 0)
         {
             add_headers(file_stat->status.st_size);
