@@ -67,7 +67,7 @@ public:
     }
     //如果目标可以加锁，对目标加锁，不能加锁返回false
     bool trylock()
-    { 
+    {
         return pthread_mutex_trylock(&m_mutex) == 0;
     }
     bool unlock()
@@ -119,5 +119,14 @@ public:
 private:
     pthread_cond_t m_cond;
     pthread_mutex_t m_mutex;
+};
+
+class MutexLockGuard : Noncopyable
+{
+public:
+    explicit MutexLockGuard(locker &_mutex) : mutex(_mutex) { mutex.lock(); }
+    ~MutexLockGuard() { mutex.unlock(); }
+private:
+    locker &mutex;
 };
 #endif //WEBSERVER_LOCKER_H_
