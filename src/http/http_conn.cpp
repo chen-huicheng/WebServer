@@ -570,14 +570,12 @@ bool http_conn::process_write(HTTP_CODE ret)
     case FORBIDDEN_REQUEST:
     {
         add_status_line(302, redirect_302_title);
+        add_response("Location:/index.html\r\n");
+        add_blank_line();       //必须添加空行 不然客户端无法判断数据是否发送完
         // add_status_line(403, error_403_title);
         // add_headers(strlen(error_403_form));
-        add_response("Location:/index.html\r\n");
-        add_content_length(strlen(redirect_302_from));
-        add_linger();
-        add_blank_line();
-        if (!add_content(redirect_302_from))
-            return false;
+        // if (!add_content(error_403_form))
+            // return false;
         break;
     }
     case FILE_REQUEST:
