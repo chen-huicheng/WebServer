@@ -9,7 +9,7 @@
 #include "locker.h"
 using namespace std;
 
-enum LOGIN_STATUS        //用户状态
+enum LOGIN_STATUS //用户状态
 {
     LOGIN = 0,
     UNLOGIN,
@@ -17,29 +17,28 @@ enum LOGIN_STATUS        //用户状态
 };
 struct User //用户信息
 {
-    string username;    //用户名
-    string sessionid;   //sessionId
+    string username;     //用户名
+    string sessionid;    //sessionId
     LOGIN_STATUS status; //状态
-    time_t last_time;   //上次请求时间
+    time_t last_time;    //上次请求时间
 };
 class Session
 {
 public:
-    Session(int capacity, int timeout) : cap(capacity), timeout(timeout) //Session最大容量
+    Session(int capacity, int timeout) : cap(capacity), timeout(timeout) //cap: Session最大容量 timeout:session保存时长（单位分钟）
     {
     }
-    LOGIN_STATUS get_status(string sessionid)
+    LOGIN_STATUS get_status(string sessionid) //返回用户状态
     {
         MutexLockGuard lock(mutex);
         if (cache.count(sessionid))
         {
-            LOG_ERROR("sessionid %s\n",sessionid.c_str());
             movetotop(sessionid);
             return cache[sessionid]->status;
         }
         return UNLOGIN;
     }
-    string get_username(string sessionid)
+    string get_username(string sessionid) //返回用户名
     {
         MutexLockGuard lock(mutex);
         if (cache.count(sessionid))
@@ -51,8 +50,8 @@ public:
     }
     string put(string username) //首次添加返回sessionid
     {
-        string sessionid = MD5(username);
         MutexLockGuard lock(mutex);
+        string sessionid = MD5(username);
         if (0 == cache.count(sessionid))
         {
             if (users.size() >= cap)
@@ -68,18 +67,19 @@ public:
             users.push_front(user);
             cache[sessionid] = users.begin();
         }
-        cache[sessionid]->status=LOGIN;
+        cache[sessionid]->status = LOGIN;
         dealtimeout();
         return sessionid;
     }
 
 private:
-    void movetotop(string key)
+    void movetotop(string key) //将最新访问的用户移动到最前变
     {
         auto p = *cache[key];
         users.erase(cache[key]);
         users.push_front(p);
         cache[key] = users.begin();
+        users.front().last_time = time(NULL);
         dealtimeout();
     }
     void dealtimeout()
@@ -91,7 +91,7 @@ private:
             users.pop_back();
         }
     }
-    string MD5(const string &src)
+    string MD5(const string &src) //MD5 生成 sessionid
     {
         MD5_CTX ctx;
 
@@ -112,7 +112,7 @@ private:
         return md5_string;
     }
     typedef list<User> List;
-    size_t cap;                           // Cache容量
+    size_t cap;                        //Cache容量
     int timeout;                       //session失效时间
     List users;                        //访问时间排序
     map<string, List::iterator> cache; //缓冲
