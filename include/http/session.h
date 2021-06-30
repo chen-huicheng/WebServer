@@ -33,6 +33,7 @@ public:
         MutexLockGuard lock(mutex);
         if (cache.count(sessionid))
         {
+            LOG_ERROR("sessionid %s\n",sessionid.c_str());
             movetotop(sessionid);
             return cache[sessionid]->status;
         }
@@ -97,9 +98,9 @@ private:
         string md5_string;
         unsigned char md[16] = {0};
         char tmp[40] = {0};
-
+        string code = src + to_string(time(NULL));
         MD5_Init(&ctx);
-        MD5_Update(&ctx, src.c_str(), src.size());
+        MD5_Update(&ctx, code.c_str(), code.size());
         MD5_Final(md, &ctx);
 
         for (int i = 0; i < 16; ++i)

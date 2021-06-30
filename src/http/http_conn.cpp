@@ -2,7 +2,9 @@
 
 //定义http响应的一些状态信息
 const char *ok_200_title = "OK";
+const char *redirect_302_title = "Found";
 const char *error_400_title = "Bad Request";
+const char *redirect_302_from = "redirect";
 const char *error_400_form = "Your request has bad syntax or is inherently impossible to staisfy.\n";
 const char *error_403_title = "Forbidden";
 const char *error_403_form = "You do not have permission to get file form this server.\n";
@@ -226,7 +228,8 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
         text+=7;
         text += strspn(text, " \t");
         char *p = strpbrk(text, ";");
-        *p='\0';
+        if(p)
+            *p='\0';
         sessionid = string(text);
         login_stat = session.get_status(sessionid);
     }
@@ -352,10 +355,8 @@ http_conn::HTTP_CODE http_conn::do_get_request()
     if(strstr(m_url,"/pages/user/")!=NULL){
         if(sessionid.empty()||session.get_status(sessionid)==UNLOGIN)
         {
-            LOG_ERROR("%s\n",sessionid.c_str());
             return FORBIDDEN_REQUEST;
         }
-            // 
     }
     strcpy(m_real_file, doc_root.c_str());
     int len = doc_root.size();
@@ -568,9 +569,14 @@ bool http_conn::process_write(HTTP_CODE ret)
     }
     case FORBIDDEN_REQUEST:
     {
-        add_status_line(403, error_403_title);
-        add_headers(strlen(error_403_form));
-        if (!add_content(error_403_form))
+        add_status_line(302, redirect_302_title);
+        // add_status_line(403, error_403_title);
+        // add_headers(strlen(error_403_form));
+        add_response("Location:/index.html\r\n");
+        add_content_length(strlen(redirect_302_from));
+        add_linger();
+        add_blank_line();
+        if (!add_content(redirect_302_from))
             return false;
         break;
     }
