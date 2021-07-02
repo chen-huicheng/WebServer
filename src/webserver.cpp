@@ -11,7 +11,8 @@ WebServer::WebServer()
 
     //root文件夹路径
     char server_path[200];
-    getcwd(server_path, 200);
+    char *root_path = getcwd(server_path, 200);
+    LOG_INFO("root path:%s\n",root_path);
     char root[6] = "/root";
     root_dir.append(server_path);
     root_dir.append(root);
@@ -43,6 +44,7 @@ void WebServer::initIO()
     listenfd = open_listenfd(port);
     if (setnonblocking(listenfd) == -1)
     {
+
         LOG_ERROR("set socket non block failed\n");
         abort();
     }
