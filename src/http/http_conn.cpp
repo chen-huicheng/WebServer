@@ -332,6 +332,7 @@ http_conn::HTTP_CODE http_conn::do_post_request()
     {
         string username = kv_pair["username"];
         string passwd = kv_pair["passwd"];
+        // LOG_DEBUG("U:%s,P:%s\n",username.c_str(),passwd.c_str());
         if (register_user(username, passwd))
         {
             m_url = strcat(m_real_file+doc_root.size()+10,"/pages/user/welcome.html");
@@ -519,7 +520,7 @@ bool http_conn::add_content_type()
 }
 bool http_conn::add_cookie()
 {
-    LOG_INFO("set-cookie:%s\r\n", "text/html");
+    LOG_INFO("set-cookie:%s\r\n", sessionid.c_str());
     if(!sessionid.empty()&&login_stat==FIRST_LOGIN)
         return add_response("set-cookie:%s\r\n", sessionid.c_str());
     return true;
